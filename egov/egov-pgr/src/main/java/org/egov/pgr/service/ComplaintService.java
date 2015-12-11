@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
@@ -48,7 +47,6 @@ import javax.persistence.PersistenceContext;
 import javax.validation.ValidationException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.egov.commons.service.CommonsService;
 import org.egov.config.search.Index;
 import org.egov.config.search.IndexType;
 import org.egov.eis.service.AssignmentService;
@@ -120,9 +118,6 @@ public class ComplaintService {
     private CitizenInboxService citizenInboxService;
 
     @Autowired
-    private CommonsService commonsService;
-
-    @Autowired
     private BoundaryService boundaryService;
 
     @Autowired
@@ -164,15 +159,15 @@ public class ComplaintService {
         }
         complaint.setStatus(complaintStatusService.getByName("REGISTERED"));
         if (complaint.getLocation() == null && complaint.getLat() != 0.0 && complaint.getLng() != 0.0) {
-            
-            final Long bndryId = commonsService.getBndryIdFromShapefile(complaint.getLat(), complaint.getLng());
-            if (bndryId != null && bndryId != 0 ) {
-                location = boundaryService.getBoundaryById(bndryId);
-                complaint.setLocation(location);
-            } else{
-                location = boundaryService.getBoundaryByBndryTypeNameAndHierarchyTypeName("City", "LOCATION");
-                complaint.setLocation(location);
-                }
+            // Commenting out code as Ward boundary does not exist in our master data
+            /*
+             * final Long bndryId =null; commonsService.getBndryIdFromShapefile(complaint.getLat(), complaint.getLng()); if
+             * (bndryId != null && bndryId != 0 ) { location = boundaryService.getBoundaryById(bndryId);
+             * complaint.setLocation(location); } else{
+             */
+            location = boundaryService.getBoundaryByBndryTypeNameAndHierarchyTypeName("City", "LOCATION");
+            complaint.setLocation(location);
+            // }
 
         }
         final Position assignee = complaintRouterService.getAssignee(complaint);
@@ -493,9 +488,9 @@ public class ComplaintService {
         criteria.add(Restrictions.eq("complaint.assignee", positionMasterService.getCurrentPositionForUser(user.getId())));
         return criteria.list();
     }
-    
-    public void getAnonymousRole(Set<Role> roles ){
+
+    public void getAnonymousRole(final Set<Role> roles) {
         roles.add(roleService.getRoleByName("Citizen"));
-        
+
     }
 }
