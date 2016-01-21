@@ -196,6 +196,7 @@
 		<module>egov-ptis</module>
 		<module>egov-adtax</module>
 		<module>egov-wtms</module>
+		<module>egov-stms</module>
 		<module>egov-tl</module>
 		<module>egov-eisweb</module>
 		<module>egov-egiweb</module>
@@ -209,6 +210,7 @@
 		<module>egov-ptisweb</module>
 		<module>egov-adtaxweb</module>
 		<module>egov-wtmsweb</module>
+		<module>egov-stmsweb</module>
 		<module>egov-dashboardweb</module>
 		<module>egov-tlweb</module>
 		<module>egov-ear</module>
