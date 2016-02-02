@@ -53,6 +53,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -133,8 +134,8 @@ public class SewerageApplicationDetails extends StateAware {
     private List<SewerageConnectionEstimationDetails> estimationDetails = new ArrayList<SewerageConnectionEstimationDetails>(0);
 
     @OrderBy("id desc")
-    @OneToMany(mappedBy = "applicationDetails", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<SewerageFieldInspectionDetails> fieldInspectionDetails = new ArrayList<SewerageFieldInspectionDetails>(0);
+    @OneToOne(mappedBy = "applicationDetails", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private SewerageFieldInspectionDetails fieldInspectionDetails;
 
     @Override
     public Long getId() {
@@ -250,11 +251,11 @@ public class SewerageApplicationDetails extends StateAware {
         this.estimationDetails = estimationDetails;
     }
 
-    public List<SewerageFieldInspectionDetails> getFieldInspectionDetails() {
+    public SewerageFieldInspectionDetails getFieldInspectionDetails() {
         return fieldInspectionDetails;
     }
 
-    public void setFieldInspectionDetails(final List<SewerageFieldInspectionDetails> fieldInspectionDetails) {
+    public void setFieldInspectionDetails(final SewerageFieldInspectionDetails fieldInspectionDetails) {
         this.fieldInspectionDetails = fieldInspectionDetails;
     }
 

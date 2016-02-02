@@ -34,14 +34,21 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.egov.infra.utils.ApplicationNumberGenerator;
+import org.egov.ptis.domain.model.AssessmentDetails;
+import org.egov.ptis.domain.service.property.PropertyExternalService;
 import org.egov.stms.masters.entity.enums.SewerageConnectionStatus;
 import org.egov.stms.transactions.entity.SewerageApplicationDetails;
 import org.egov.stms.transactions.entity.SewerageConnection;
 import org.egov.stms.transactions.repository.SewerageApplicationDetailsRepository;
+import org.egov.stms.utils.SewerageTaxUtils;
 import org.egov.stms.utils.constants.SewerageTaxConstants;
+import org.egov.wtms.masters.entity.enums.ConnectionStatus;
+import org.egov.wtms.masters.service.DocumentNamesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -53,7 +60,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class SewerageApplicationDetailsService {
 
+    @Autowired
+    private DocumentNamesService documentNamesService;
+
+    @Autowired
+    private SewerageTaxUtils sewerageTaxUtils;
+
+    @Autowired
+    private ResourceBundleMessageSource messageSource;
+
     protected SewerageApplicationDetailsRepository sewerageApplicationDetailsRepository;
+
+    @Autowired
+    private ApplicationNumberGenerator applicationNumberGenerator;
+
     private static final Logger LOG = LoggerFactory.getLogger(SewerageApplicationDetailsService.class);
 
     @Autowired
@@ -86,6 +106,9 @@ public class SewerageApplicationDetailsService {
 
     @Transactional
     public SewerageApplicationDetails create(final SewerageApplicationDetails sewerageApplicationDetails) {
+        if (sewerageApplicationDetails.getApplicationNumber() == null)
+            sewerageApplicationDetails.setApplicationNumber(applicationNumberGenerator.generate());
+        sewerageApplicationDetails.setApplicationDate(new Date());
         final SewerageApplicationDetails savedSewerageApplicationDetails = sewerageApplicationDetailsRepository
                 .save(sewerageApplicationDetails);
         return savedSewerageApplicationDetails;
@@ -129,6 +152,83 @@ public class SewerageApplicationDetailsService {
             final SewerageConnectionStatus connectionStatus) {
         return sewerageApplicationDetailsRepository
                 .findByConnection_PropertyIdentifierAndConnection_ConnectionStatus(propertyIdentifier, connectionStatus);
+    }
+
+    public SewerageApplicationDetails getPrimaryConnectionDetailsByPropertyIdentifier(final String propertyIdentifier) {
+        return sewerageApplicationDetailsRepository.getPrimaryConnectionDetailsByPropertyID(propertyIdentifier);
+    }
+
+    public String checkValidPropertyAssessmentNumber(final String asessmentNumber) {
+        String errorMessage = "";
+        final AssessmentDetails assessmentDetails = sewerageTaxUtils.getAssessmentDetailsForFlag(asessmentNumber,
+                PropertyExternalService.FLAG_FULL_DETAILS);
+        errorMessage = validateProperty(assessmentDetails);
+        if (errorMessage.isEmpty())
+            errorMessage = validatePTDue(asessmentNumber, assessmentDetails);
+        return errorMessage;
+    }
+
+    /**
+     * @param assessmentDetails
+     * @return ErrorMessage If PropertyId is Not Valid
+     */
+    private String validateProperty(final AssessmentDetails assessmentDetails) {
+        String errorMessage = "";
+        if (assessmentDetails.getErrorDetails() != null && assessmentDetails.getErrorDetails().getErrorCode() != null)
+            errorMessage = assessmentDetails.getErrorDetails().getErrorMessage();
+        return errorMessage;
+    }
+
+    private String validatePTDue(final String asessmentNumber, final AssessmentDetails assessmentDetails) {
+        String errorMessage = "";
+        if (assessmentDetails.getPropertyDetails() != null
+                && assessmentDetails.getPropertyDetails().getTaxDue() != null
+                && assessmentDetails.getPropertyDetails().getTaxDue().doubleValue() > 0)
+
+            /**
+             * If property tax due present and configuration value is 'NO' then restrict not to allow new water tap connection
+             * application. If configuration value is 'YES' then new water tap connection can be created even though there is
+             * Property Tax Due present.
+             **/
+            if (!sewerageTaxUtils.isNewConnectionAllowedIfPTDuePresent())
+                errorMessage = messageSource.getMessage("err.validate.property.taxdue", new String[] {
+                        assessmentDetails.getPropertyDetails().getTaxDue().toString(), asessmentNumber, "new" }, null);
+        return errorMessage;
+    }
+
+    public String checkConnectionPresentForProperty(final String propertyID) {
+        String validationMessage = "";
+        /**
+         * Validate only if configuration value is 'NO' for multiple new connection per property allowed or not. If configuration
+         * value is 'YES' then multiple new connections are allowed. This will impact on the Additional connection feature.
+         **/
+        if (!sewerageTaxUtils.isMultipleNewConnectionAllowedForPID()) {
+            final SewerageApplicationDetails sewerageApplicationDetails = getPrimaryConnectionDetailsByPropertyIdentifier(propertyID);
+            if (sewerageApplicationDetails != null)
+                if (sewerageApplicationDetails.getConnection().getConnectionStatus().toString()
+                        .equalsIgnoreCase(ConnectionStatus.ACTIVE.toString()))
+                    validationMessage = messageSource.getMessage("err.validate.newconnection.active", new String[] {
+                            sewerageApplicationDetails.getConnection().getDhscNumber(), propertyID }, null);
+                else if (sewerageApplicationDetails.getConnection().getConnectionStatus().toString()
+                        .equalsIgnoreCase(ConnectionStatus.INPROGRESS.toString()))
+                    validationMessage = messageSource.getMessage("err.validate.newconnection.application.inprocess",
+                            new String[] { propertyID, sewerageApplicationDetails.getApplicationNumber() }, null);
+                else if (sewerageApplicationDetails.getConnection().getConnectionStatus().toString()
+                        .equalsIgnoreCase(ConnectionStatus.DISCONNECTED.toString()))
+                    validationMessage = messageSource
+                            .getMessage("err.validate.newconnection.disconnected", new String[] {
+                                    sewerageApplicationDetails.getConnection().getDhscNumber(), propertyID }, null);
+                else if (sewerageApplicationDetails.getConnection().getConnectionStatus().toString()
+                        .equalsIgnoreCase(ConnectionStatus.CLOSED.toString()))
+                    validationMessage = messageSource
+                            .getMessage("err.validate.newconnection.closed", new String[] {
+                                    sewerageApplicationDetails.getConnection().getDhscNumber(), propertyID }, null);
+                else if (sewerageApplicationDetails.getConnection().getConnectionStatus().toString()
+                        .equalsIgnoreCase(ConnectionStatus.HOLDING.toString()))
+                    validationMessage = messageSource.getMessage("err.validate.newconnection.holding", new String[] {
+                            sewerageApplicationDetails.getConnection().getDhscNumber(), propertyID }, null);
+        }
+        return validationMessage;
     }
 
 }

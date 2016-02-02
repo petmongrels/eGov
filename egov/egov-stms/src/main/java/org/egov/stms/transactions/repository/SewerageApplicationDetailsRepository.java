@@ -37,7 +37,10 @@ import org.egov.stms.masters.entity.SewerageApplicationType;
 import org.egov.stms.masters.entity.enums.SewerageConnectionStatus;
 import org.egov.stms.transactions.entity.SewerageApplicationDetails;
 import org.egov.stms.transactions.entity.SewerageConnection;
+import org.egov.wtms.application.entity.WaterConnectionDetails;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -70,5 +73,9 @@ public interface SewerageApplicationDetailsRepository extends JpaRepository<Sewe
 
     SewerageApplicationDetails findByConnection_PropertyIdentifierAndConnection_ConnectionStatus(String propertyIdentifier,
             SewerageConnectionStatus connectionStatus);
+    
+    @Query("select scd from SewerageApplicationDetails scd where scd.connection.connectionStatus not in ('INACTIVE') and scd.connection.propertyIdentifier =:propertyIdentifier")
+    SewerageApplicationDetails getPrimaryConnectionDetailsByPropertyID(
+            @Param("propertyIdentifier") String propertyIdentifier);
 
 }

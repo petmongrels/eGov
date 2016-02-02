@@ -44,4 +44,14 @@ public class SewerageTaxConstants {
     public static final String FILESTORE_MODULECODE = "STMS";
     public static final String MODULE_NAME = "Sewerage Tax Management";
     public static final String APPLICATION_NUMBER = "applicationNumber";
+    public static final String NEWCONNECTION = "NEWCONNECTION";
+    public static final String MODULETYPE = "WATERTAXAPPLICATION";
+    
+    // appconfig keys
+    public static final String NEWCONNECTIONALLOWEDIFPTDUE = "NEWCONNECTIONALLOWEDIFPTDUE";
+    public static final String DOCUMENTREQUIREDFORBPL = "DOCUMENTREQUIREDFORBPL";
+    public static final String MULTIPLENEWCONNECTIONFORPID = "MULTIPLENEWCONNECTIONFORPID";
+    
+    // application constants
+    public static final String APPLICATION_STATUS_CREATED = "CREATED";
 }
