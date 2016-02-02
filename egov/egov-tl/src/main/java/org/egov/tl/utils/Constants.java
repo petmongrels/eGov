@@ -56,6 +56,8 @@ public class Constants {
 	public static final String TEMP_LICENSE_NUMBER = "TLNT_LICENSE_NUMBER";
 	public static final String TEMP_LICENSE_NUMBER_PREFIX = "TLNT";
 	public static final String NOTICE_NUMBER = "NOTICE_NUMBER";
+	public static final String SOURCE_TYPE = "SYSTEM";
+	
 
 	public static final String GENDER_MALE = "Male";
 	public static final String GENDER_FEMALE = "Female";
@@ -91,6 +93,7 @@ public class Constants {
 	public static final String WF_STATE_ZO_Approval_Pending = "ZO Approval Pending";
 	public static final String WF_STATE_COLLECTION_PENDING = "Create License:Commissioner Approved";
 	public static final String WF_STATE_INSPECTION_PENDING="Create License:Sanitary inspector Approve pending";
+	public static final String WF_STATE_GENERATE_CERTIFICATE="Create License:generate Certificate";
 	public static final String WF_STATE_LICENSE_NOT_APPROVED = "License Not Approved";
 	public static final String WF_STATE_RENEWAL_PRINT_PENDING = "Renewal Print Pending";
 	public static final String WF_STATE_SANITORY_INSPECTOR_APPROVAL_PENDING = "Sanitary inspector Approve pending";
@@ -312,7 +315,7 @@ public class Constants {
 	
 	public static final String BUTTONFORWARD = "Forward";
 	public static final String BUTTONREJECT = "Reject";
-	public static final String BUTTONSAVE = "Save";
+	public static final String BUTTONSUBMIT = "Submit";
 	public static final String BUTTONGENERATEDCERTIFICATE = "GeneratedCertificate";
 	public static final String BUTTONGENERATEDREJECTCERTIFICATE = "GeneratedREJECTCertificate";
 	public static final String BUTTONPRINTCOMPLETED = "PrintCompleted";
@@ -394,6 +397,8 @@ public class Constants {
 	public static final String HKR_APPL = "HKR-APPL";
 	public static final String HAWKERLICENSE = "HawkerLicense";
 	public static final String TRADELICENSE = "TradeLicense";
+	public static final String TRADELICENSEMODULE = "TRADELICENSE";
+	
 	public static final String HOSPITALLICENSE = "HospitalLicense";
 	public static final String PWDCONTRACTORLICENSE = "PwdContractorLicense";
 	public static final String ELECTRICALCONTRACTORLICENSE = "ElectricalContractorLicense";
@@ -730,4 +735,13 @@ public class Constants {
 	public static final String LICENSE_BILLNO_SEQ = "SEQ_BILLNO_";
 	
 	public static final String LICENSE_FEE_TYPE="License Fee";
+	
+	public static final String APPLICATION_STATUS_CREATED_CODE = "CREATED";
+        public static final String APPLICATION_STATUS_INSPE_CODE = "INSPECTIONDONE";
+        public static final String APPLICATION_STATUS_APPROVED_CODE = "APPROVED";
+        public static final String APPLICATION_STATUS_COLLECTION_CODE = "COLLECTIONAMOUNTPAID";
+        public static final String APPLICATION_STATUS_DIGUPDATE_CODE = "DIGITALSIGNUPDATED";
+        public static final String APPLICATION_STATUS_GENECERT_CODE = "CERTIFICATEGENERATED";
+        
+        public static final String REVENUE_HIERARCHYTYPE = "REVENUE";
 }

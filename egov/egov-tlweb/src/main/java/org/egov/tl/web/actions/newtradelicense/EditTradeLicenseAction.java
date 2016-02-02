@@ -92,7 +92,6 @@ public class EditTradeLicenseAction extends BaseLicenseAction {
     private String mode;
     private Map<String, String> ownerShipTypeMap;
     private BigDecimal totalAmount = BigDecimal.ZERO;
-    private List<MotorDetails> installedMotorList = new ArrayList<MotorDetails>();
     private Long id;
 
     @Autowired
@@ -154,6 +153,9 @@ public class EditTradeLicenseAction extends BaseLicenseAction {
         this.addDropdownData("uomList", this.unitOfMeasurementService.findAllActiveUOM());
         addDropdownData("subCategoryList", tradeLicense.getCategory() == null ? Collections.emptyList() :
                 licenseSubCategoryService.findAllSubCategoryByCategory(tradeLicense.getCategory().getId()));
+        if(license() != null && license().getAgreementDate()!=null){
+            setShowAgreementDtl(true);
+        }
 
     }
 
@@ -185,28 +187,6 @@ public class EditTradeLicenseAction extends BaseLicenseAction {
             this.tradeLicenseService.transitionWorkFlow(this.tradeLicense, this.workflowBean);
         if (!this.isOldLicense)
             this.processWorkflow(NEW);
-        if (this.installedMotorList != null) {
-            List<MotorDetails> motorDetailsList = new ArrayList<MotorDetails>();
-            Iterator<MotorDetails> motorDetails = this.installedMotorList.iterator();
-            while (motorDetails.hasNext()) {
-                MotorDetails installedMotor = motorDetails.next();
-                if (installedMotor != null && installedMotor.getHp() != null && installedMotor.getNoOfMachines() != null
-                        && installedMotor.getHp().compareTo(BigDecimal.ZERO) != 0
-                        && installedMotor.getNoOfMachines().compareTo(Long.valueOf("0")) != 0) {
-                    installedMotor.setLicense(this.tradeLicense);
-                    motorDetailsList.add(installedMotor);
-                }
-            }
-            if (!this.tradeLicense.getInstalledMotorList().isEmpty()) {
-                for (MotorDetails md : this.tradeLicense.getInstalledMotorList())
-                    this.tradeLicense.getInstalledMotorList().remove(this.getPersistenceService().findById(md.getId(), false));
-            }
-            if (this.installedMotorList != null && !this.installedMotorList.isEmpty()) {
-                this.tradeLicense.getInstalledMotorList().clear();
-                this.tradeLicense.getInstalledMotorList().addAll(motorDetailsList);
-            }
-        }
-
         this.tradeLicenseService.processAndStoreDocument(this.tradeLicense.getDocuments());
 
         LicenseAppType newAppType = (LicenseAppType) this.persistenceService.find("from  LicenseAppType where name='New' ");
@@ -290,13 +270,4 @@ public class EditTradeLicenseAction extends BaseLicenseAction {
     public void setId(Long id) {
         this.id = id;
     }
-
-    public List<MotorDetails> getInstalledMotorList() {
-        return this.installedMotorList;
-    }
-
-    public void setInstalledMotorList(List<MotorDetails> installedMotorList) {
-        this.installedMotorList = installedMotorList;
-    }
-
 }

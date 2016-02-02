@@ -49,6 +49,8 @@ import org.springframework.stereotype.Repository;
 @Repository 
 public interface LicenseCategoryRepository extends JpaRepository<LicenseCategory,Long> {
 
-LicenseCategory findByName(String name);
+LicenseCategory findByNameIgnoreCase(String name);
+
+LicenseCategory findByCodeIgnoreCase(String code);
 
 }

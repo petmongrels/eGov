@@ -39,14 +39,47 @@
   --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<script>
+jQuery(document).ready(function(){
+	 jQuery('#subCategory').change(function() {
+		console.log("came jursidiction"+jQuery('#subCategory').val());
+		getUom();
+	});
+	 <s:if test="%{hasErrors() || mode=='view' || mode=='edit'}">
+	 if(jQuery('#subCategory').val()!='-1'){
+		 getUom();
+	 }
+	</s:if>  
+});
 
+function getUom(){
+	jQuery.ajax({
+		url: "../domain/commonTradeLicenseAjax-ajaxLoadUomName.action", 
+		type: "GET",
+		data: {
+			subCategoryId : jQuery('#subCategory').val(),
+			feeTypeId :  jQuery('#feeTypeId').val()
+		},
+		cache: false,
+		dataType: "json",
+		success: function (response) {
+			jQuery('#uom').val(response.uom);
+		}, 
+		error: function (response) {
+			console.log("failed");
+			jQuery('#uom').val('');
+			bootbox.alert("No UOM mapped for SubCategory")
+		}
+	});
+}
+</script>
 <div class="panel-heading custom_form_panel_heading">
     <div class="panel-title"><s:text name='license.details.lbl' /></div>
 </div>
 <div class="form-group">
-    <label class="col-sm-3 control-label text-right"><s:text name='license.nameOfEst.lbl' /></label>
+    <label class="col-sm-3 control-label text-right"><s:text name='license.establishmentname' /></label>
     <div class="col-sm-3 add-margin">
-         	<s:textfield name="nameOfEstablishment" cssClass="form-control patternvalidation"  data-pattern="alphabetwithspace" id="nameOfEstablishment" value="%{nameOfEstablishment}" maxlength="32" onBlur="checkLength(this,32)"/>
+         	<s:textfield name="nameOfEstablishment" cssClass="form-control patternvalidation"  data-pattern="alphabetwithspace" id="nameOfEstablishment" value="%{nameOfEstablishment}" maxlength="250" onBlur="checkLength(this,32)"/>
     </div>
   
     <label class="col-sm-2 control-label text-right"><s:text name='license.tradeType.lbl' /><span class="mandatory"></span></label>
@@ -66,36 +99,56 @@
     <label class="col-sm-2 control-label text-right"><s:text name='license.subCategory.lbl' /><span class="mandatory"></span></label>
     <div class="col-sm-3 add-margin">
         <s:select name="tradeName" id="subCategory" list="dropdownData.subCategoryList"
-	listKey="id" listValue="name" headerKey="-1" headerValue="%{getText('default.select')}" value="%{tradeName.id}" class="form-control"  />
-    </div>
+	listKey="id" listValue="name" headerKey="-1" headerValue="%{getText('default.select')}" value="%{tradeName.id}" class="form-control"/>
+    </div> 
 </div>
 
 <div class="form-group">
-    <label class="col-sm-3 control-label text-right"><s:text name='license.premises.lbl' /><span class="mandatory"></span></label>
+    <label class="col-sm-3 control-label text-right"><s:text name='license.uom.lbl' /><span class="mandatory"></span></label>
+     <div class="col-sm-3 add-margin">
+        <s:textfield name="uom" maxlength="8" id="uom" value="%{tradeName.licenseSubCategoryDetails[0].uom.name}"  readOnly="true" class="form-control"  />
+    </div>
+    <label class="col-sm-2 control-label text-right"><s:text name='license.premises.lbl' /><span class="mandatory"></span></label>
     <div class="col-sm-3 add-margin">
         <s:textfield name="tradeArea_weight" maxlength="8" id="tradeArea_weight" value="%{tradeArea_weight}" cssClass="form-control patternvalidation"  data-pattern="number"  />
-    </div>
-    <label class="col-sm-2 control-label text-right"><s:text name='license.uom.lbl' /><span class="mandatory"></span></label>
-    <div class="col-sm-3 add-margin">
-         <s:select name="uom" id="uom" list="dropdownData.uomList"
-	listKey="id" listValue="name" headerKey="-1" headerValue="%{getText('default.select')}" value="%{uom.id}" class="form-control"  />
     </div>
 </div>
 
 <div class="form-group">
     <label class="col-sm-3 control-label text-right"><s:text name='license.remarks.lbl' /></label>
     <div class="col-sm-3 add-margin">
-         <s:textarea name="remarks" id="remarks" value="%{remarks}" maxlength="500" class="form-control"/>
+         <s:textarea name="remarks" id="remarks" value="%{remarks}" maxlength="250" class="form-control"/>
     </div>
     
-	<label class="col-sm-2 control-label text-right"><s:text name='license.startdate' /></label>
+	<label class="col-sm-2 control-label text-right"><s:text name='license.startdate' /><span class="mandatory"></span></label>
 	<div class="col-sm-3 add-margin">
-	
-	<s:textfield name="startDate" cssClass="form-control datepicker" data-date-end-date="0d" id="startDate"  maxlength="10" value="%{startdate}"/>
-	    
-		<%--<s:date name="startDate" id="startdate" format="dd/MM/yyyy" />
-		 <s:textfield name="startDate" id="startDate" onfocus="waterMarkTextIn('startDate','dd/mm/yyyy');" onblur="validateDateFormat(this);waterMarkTextOut('startDate','dd/mm/yyyy'); lessThanOrEqualToCurrentDate(this);" maxlength="10" size="10" value="%{startdate}" tabindex="4" onkeyup="DateFormat(this,this.value,event,false,'3')" />
-		<a href="javascript:show_calendar('forms[0].startDate',null,null,'DD/MM/YYYY');" onmouseover="window.status='Date Picker';return true;" onmouseout="window.status='';return true;"> <img  alt="Date" width="18" height="18" border="0" align="absmiddle" id="calenderImgId" src="${pageContext.request.contextPath}/resources/image/calendaricon.gif" /> </a>
-		 --%>
+	<s:date name="startDate" id="formattedStartDate" format="dd/MM/yyyy" />
+	<s:textfield name="startDate" cssClass="form-control datepicker" required="true" data-date-end-date="0d" id="startDate"  maxlength="10" value="%{formattedStartDate}"/>
     </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-3 control-label text-right"><s:text name='license.traderCheckbox.lbl' /></label>
+    <div class="col-sm-3 add-margin">
+         <s:checkbox theme="simple" key="showAgreementDtl" onclick="showHideAgreement()" id="showAgreementDtl" disabled="%{sDisabled}" />
+    </div>
+</div>
+
+<div id="agreementSec" style="display: none;"> 
+	<div class="panel-heading custom_form_panel_heading">
+	    <div class="panel-title"><s:text name='license.AgreementDetails.lbl' /></div>
+	</div>
+	
+	<div class="form-group">
+	    <label class="col-sm-3 control-label text-right"><s:text name='license.agreementDate.lbl' /><span class="mandatory"></span></label>
+	    <div class="col-sm-3 add-margin">
+		<s:date name="agreementDate" id="formattedAgreementDate" format="dd/MM/yyyy" />
+		<s:textfield name="agreementDate" cssClass="form-control datepicker" required="true" data-date-end-date="0d" id="agreementDate"  maxlength="10" value="%{formattedAgreementDate}"/>
+	    </div>
+	    
+	    <label class="col-sm-2 control-label text-right"><s:text name='license.agreementDocNo.lbl' /><span class="mandatory"></span></label>
+	    <div class="col-sm-3 add-margin">
+	        <s:textfield name="agreementDocNo" maxlength="50" id="agreementDocNo" value="%{agreementDocNo}" cssClass="form-control patternvalidation"  data-pattern="alphanumerichyphenbackslash" />
+	    </div>
+	</div>
 </div>

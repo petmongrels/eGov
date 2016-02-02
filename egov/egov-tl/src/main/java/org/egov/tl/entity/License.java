@@ -39,6 +39,7 @@
  */
 package org.egov.tl.entity;
 
+import org.egov.commons.EgwStatus;
 import org.egov.commons.Installment;
 import org.egov.demand.model.EgDemand;
 import org.egov.demand.model.EgDemandDetails;
@@ -67,7 +68,9 @@ public abstract class License extends StateAware {
     @Required(message = "license.applicationdate.err.required")
     protected Date applicationDate;
     protected String applicationNumber;
+    protected EgwStatus egwStatus;
     protected Boundary boundary;
+    protected Boundary parentBoundary;
     //this should be NatureOfBusiness only which means it is Permanent or temporary.
     protected NatureOfBusiness buildingType;
     protected Date dateOfCreation;
@@ -120,13 +123,13 @@ public abstract class License extends StateAware {
     private String ownershipType;
     private String address;
     private LicenseCategory category;
-    private BigDecimal workersCapacity;
 
     private BigDecimal tradeArea_weight;
-    private UnitOfMeasurement uom;
 
     private boolean legacy;
     private Date startDate;
+    private Date agreementDate;
+    private String agreementDocNo;
 
     public abstract String generateApplicationNumber(String runningNumber);
 
@@ -546,28 +549,12 @@ public abstract class License extends StateAware {
         this.tradeArea_weight = tradeArea_weight;
     }
 
-    public UnitOfMeasurement getUom() {
-        return this.uom;
-    }
-
-    public void setUom(UnitOfMeasurement uom) {
-        this.uom = uom;
-    }
-
     public NatureOfBusiness getBuildingType() {
         return this.buildingType;
     }
 
     public void setBuildingType(NatureOfBusiness buildingType) {
         this.buildingType = buildingType;
-    }
-
-    public BigDecimal getWorkersCapacity() {
-        return this.workersCapacity;
-    }
-
-    public void setWorkersCapacity(BigDecimal workersCapacity) {
-        this.workersCapacity = workersCapacity;
     }
 
     public LicenseAppType getLicenseAppType() {
@@ -813,4 +800,37 @@ public abstract class License extends StateAware {
                 }
         return totBal;
     }
+
+    public EgwStatus getEgwStatus() {
+        return egwStatus;
+    }
+
+    public void setEgwStatus(EgwStatus egwStatus) {
+        this.egwStatus = egwStatus;
+    }
+
+    public Boundary getParentBoundary() {
+        return parentBoundary;
+    }
+
+    public void setParentBoundary(Boundary parentBoundary) {
+        this.parentBoundary = parentBoundary;
+    }
+
+    public Date getAgreementDate() {
+        return agreementDate;
+    }
+
+    public void setAgreementDate(Date agreementDate) {
+        this.agreementDate = agreementDate;
+    }
+
+    public String getAgreementDocNo() {
+        return agreementDocNo;
+    }
+
+    public void setAgreementDocNo(String agreementDocNo) {
+        this.agreementDocNo = agreementDocNo;
+    }
+    
 }

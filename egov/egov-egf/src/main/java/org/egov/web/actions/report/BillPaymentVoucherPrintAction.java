@@ -104,7 +104,7 @@ public class BillPaymentVoucherPrintAction extends BaseFormAction {
     String paymentMode = "";
     String chequeNoComp = "";
     Long chequeNoCompL;
-    String jasperpath = "/org/egov/web/actions/report/billPaymentVoucherReport.jasper";
+    String jasperpath = "/reports/templates/billPaymentVoucherReport.jasper";
     static final long serialVersionUID = 1L;
     static final String PRINT = "print";
     CVoucherHeader voucher = new CVoucherHeader();
@@ -387,6 +387,7 @@ public class BillPaymentVoucherPrintAction extends BaseFormAction {
         return voucher == null || voucher.getDescription() == null ? "" : voucher.getDescription();
     }
 
+    @Action(value = "/report/billPaymentVoucherPrint-exportPdf")
     public String exportPdf() throws JRException, IOException {
         populateVoucher();
         inputStream = reportHelper.exportPdf(inputStream, jasperpath, getParamMap(), voucherReportList);
@@ -399,6 +400,7 @@ public class BillPaymentVoucherPrintAction extends BaseFormAction {
         return "HTML";
     }
 
+    @Action(value = "/report/billPaymentVoucherPrint-exportXls")
     public String exportXls() throws JRException, IOException {
         populateVoucher();
         inputStream = reportHelper.exportXls(inputStream, jasperpath, getParamMap(), voucherReportList);
