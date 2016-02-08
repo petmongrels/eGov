@@ -40,7 +40,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<script src="<c:url value='/resources/js/app/connectiondetails.js?rnd=${app_release_no}'/>"></script>	
+<script src="<c:url value='/resources/js/transactions/connectiondetails.js?rnd=${app_release_no}'/>"></script>	
 <div class="panel-heading custom_form_panel_heading">
 	<div class="panel-title">
 		<spring:message code="lbl.connection.details" />
@@ -71,12 +71,6 @@
 		<form:input class="form-control patternvalidation" data-pattern="number" maxlength="6" id="noOfClosetsResidential" path="connection.noOfClosetsResidential" required="required" />
 		<form:errors path="connection.noOfClosetsResidential" cssClass="add-margin error-msg" />		
 	</div>
-	<%-- <label class="col-sm-2 control-label text-right" id="rooms" style="display:none"><spring:message
-		code="lbl.no.of.rooms" /></label>
-	<div class="col-sm-3 add-margin" style="display:none" id="roomsdiv">
-			<form:input class="form-control patternvalidation" data-pattern="number" maxlength="3" id="numberOfRooms" path="numberOfRooms" />
-			<form:errors path="numberOfRooms" cssClass="add-margin error-msg" />		
-		</div>	 --%>
 	<label class="col-sm-2 control-label text-right" hidden="true" id="lblNonResidential"><spring:message
 			code="lbl.nonresidential" /><span class="mandatory"></label> 
 		<div class="col-sm-3 add-margin" hidden="true" id="valNonResidential">
@@ -85,23 +79,4 @@
 		</div>
 </div>
 
-<%-- <div class="form-group" id ="cardHolderDiv">
-	<label class="col-sm-3 control-label text-right"><spring:message
-			code="lbl.bpl.cardholdername" /><span class="mandatory"></span></label> 
-	<div class="col-sm-3 add-margin">
-		<form:input class="form-control patternvalidation" data-pattern="alphabetwithspace" maxlength="16" id="bplCardHolderName" path="bplCardHolderName" required="required"  />
-		<form:errors path="bplCardHolderName" cssClass="add-margin error-msg" />		
-	</div>
-</div> --%>
-<form:hidden id="typeOfConnection" path="" value="${typeOfConnection}"/>
-<%-- <c:if test="${mode=='addconnection'}">
-<div class="form-group">
-		<label class="col-sm-3 control-label text-right"><spring:message
-			code="lbl.addconnection.reason" /><span class="mandatory"></span></label> 
-		<div class="col-sm-8 add-margin">
-			<form:textarea class="form-control patternvalidation" data-pattern="string" maxlength="1024" id="connectionReason" path="connectionReason" required="required" />
-			<form:errors path="connectionReason" cssClass="add-margin error-msg" />		
-		</div>
-</div>	
-</c:if>	 --%>
-		
+<form:hidden id="typeOfConnection" path="" value="${typeOfConnection}"/>		

@@ -59,7 +59,6 @@ import org.egov.ptis.domain.service.property.PropertyExternalService;
 import org.egov.stms.masters.entity.SewerageApplicationType;
 import org.egov.stms.masters.entity.enums.PropertyType;
 import org.egov.stms.masters.entity.enums.SewerageConnectionStatus;
-import org.egov.stms.masters.service.SewerageApplicationTypeService;
 import org.egov.stms.transactions.entity.SewerageApplicationDetails;
 import org.egov.stms.transactions.entity.SewerageConnection;
 import org.egov.stms.transactions.service.SewerageApplicationDetailsService;
@@ -109,7 +108,6 @@ public class SewerageConnectionController extends GenericWorkFlowController {
 
     @Autowired
     public SewerageConnectionController(final SewerageTaxUtils sewerageTaxUtils,
-            final SewerageApplicationTypeService sewerageApplicationTypeService,
             final SewerageApplicationDetailsService sewerageApplicationDetailsService) {
         this.sewerageTaxUtils = sewerageTaxUtils;
         this.sewerageApplicationDetailsService = sewerageApplicationDetailsService;

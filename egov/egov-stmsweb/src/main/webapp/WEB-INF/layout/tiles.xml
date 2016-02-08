@@ -61,14 +61,14 @@
 	</definition>
 	<definition name="newconnection-form" extends="base_layout">
         <put-attribute name="page-title" value="title.newconnection" cascade="true"/>
-        <put-attribute name="body" value="/WEB-INF/views/application/newConnection-form.jsp"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/newConnection-form.jsp"/>
     </definition>
     <definition name="application-success" extends="base_layout">
         <put-attribute name="page-title" value="title.newconnection" cascade="true"/>
-        <put-attribute name="body" value="/WEB-INF/views/application/application-success.jsp"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/application-success.jsp"/>
     </definition>
 	<definition name="newSewerageConnection-ack" extends="base_layout">
         <put-attribute name="page-title" value="title.ack" cascade="true"/>
-        <put-attribute name="body" value="/WEB-INF/views/application/newSewerageConnection-ack.jsp"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/newSewerageConnection-ack.jsp"/>
     </definition>
 </tiles-definitions>

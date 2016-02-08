@@ -59,24 +59,6 @@ $(document).ready(function(){
 	
 	changecategory();
 	
-	$('#connectionType').change(function(){
-		if($('#legacy'))
-		{
-			if($('#connectionType').val()=='METERED')
-			{
-				$('#metereddetails').show();	
-			}
-			else
-			{
-				$('#metereddetails').hide();
-			}
-		}
-	});
-		
-	$('#connectionCategorie').change(function(){
-		changecategory();
-	});
-	
 	$('#propertyIdentifier').blur(function(){
 		validatePrimaryConnection();		
 	});
@@ -105,7 +87,7 @@ $(document).ready(function(){
 		propertyID=$('#propertyIdentifier').val()
 		if(propertyID != '') {
 			$.ajax({
-				url: "/wtms//ajaxconnection/check-primaryconnection-exists",      
+				url: "/stms/ajaxconnection/check-primaryconnection-exists",      
 				type: "GET",
 				data: {
 					propertyID : propertyID  
@@ -148,107 +130,7 @@ $(document).ready(function(){
 			});
 		}		
 	}
-	
-	changeLabel();
-	function changeLabel() {
-		if ($('#usageType :selected').text().localeCompare("Lodges") == 0) {
-			$('#persons').hide();
-			$('#rooms').show();
-			$('#personsdiv').hide();
-			$('#roomsdiv').show();
-			$('#numberOfPerson').val('');
-		}
-		else {
-			$('#persons').show();
-			$('#rooms').hide();
-			$('#personsdiv').show();
-			$('#roomsdiv').hide();
-			$('#numberOfRooms').val('');
-		}
-	}
-	$('#usageType').change(function () {
-		changeLabel();
-	});
-	
-	deptapp=$('#approvalDepartment').val() ;
-//	if(deptapp.length != 0){
-//	$.ajax({
-//		url: "/eis/ajaxWorkFlow-getDesignationsByObjectType",     
-//		type: "GET",
-//		data: {
-//			approvalDepartment : $('#approvalDepartment').val(),
-//			departmentRule : $('#approvalDepartment').find("option:selected").text(),
-//			type : $('#stateType').val(),
-//			currentState : $('#currentState').val(),
-//			amountRule : $('#amountRule').val(),
-//			additionalRule : $('#additionalRule').val(),
-//			pendingAction : $('#pendingActions').val()
-//		},
-//		dataType: "json",
-//		success: function (response) {
-//			console.log("success"+response);
-//			$('#approvalDesignation').empty();
-//			
-//			$.each(response, function(index, value) {
-//				$('#approvalDesignation').append($('<option>').text(value.name).attr('value', value.id));
-//			});
-//			
-//		}, 
-//		error: function (response) {
-//			bootbox.alert('json fail');
-//			console.log("failed");
-//		}
-//	});
-//	if($('#approvalPosOnValidate').val().length != 0){
-//	$.ajax({
-//		url: "/wtms/ajaxconnection/assignmentByPositionId",     
-//		type: "GET",
-//		data: {
-//			approvalPositionId : $('#approvalPosOnValidate').val(),
-//			
-//		},
-//		dataType: "json",
-//		success: function (response) {
-//			console.log("success"+response);
-//			$('#approvalPosition').empty();
-//			$.each(response, function(index, value) {
-//				//$('#approvalPosition').append($('<option>').text(value.name).attr('value', value.id));
-//				$('#approvalPosition').append($('<option>').text(value.userName+'/'+value.positionName).attr('value', value.positionId));  
-//			});
-//			
-//		}, 
-//		error: function (response) {
-//			console.log("failed");
-//		}
-//	});
-//	}
-//	}
-	
 });
-$('#consumerCodeData').blur(function(){
-	console.log('Got blur event');
-		$.ajax({
-				url: "/wtms/ajax-consumerCodeExistFordataEntry",     
-					type: "GET",
-					cache: true,
-					data: {
-						consumerCode : $('#consumerCodeData').val() 
-						
-					},
-					dataType: "json",
-			}).done(function(value) {
-				 if(value == true) {
-					 bootbox.alert('Entered ConsumerCode Allready Exist');
-					 $('#consumerCodeData').val('');
-					 return false;
-				 } else {
-					 document.forms[0].submit;
-					 return true; 
-				 }
-			});
-		
-	});
-
 
 function loadPropertyDetails() {
 	propertyID=$('#propertyIdentifier').val()
@@ -261,7 +143,7 @@ function loadPropertyDetails() {
 			dataType: "json",
 			success: function (response) { 
 				console.log("success"+response);
-				
+				var waterTaxDue = getWaterTaxDue(propertyID);
 				if(response.errorDetails.errorCode != null && response.errorDetails.errorCode != '') {
 					if($('#legacy'))
 					{
@@ -272,7 +154,12 @@ function loadPropertyDetails() {
 				else {	
 					if(allowIfPTDueExists=='false' && response.propertyDetails.taxDue > 0) {
 						resetPropertyDetails();
-						errorMessage = "Property tax is due with Rs. "+response.propertyDetails.taxDue+"/- for the assessment no "+propertyID+", please pay the due amount to create new water tap connection"
+						errorMessage = "Property tax is due with Rs. "+response.propertyDetails.taxDue+"/- for the assessment no "+propertyID+", please pay the due amount to create new Sewerage connection";
+					}
+					else if(waterTaxDue > 0) {
+						errorMessage += "Water tax is due with Rs. "+waterTaxDue+"/- for the assessment no "+propertyID+", please pay the due amount to create new Sewerage connection";
+					}
+					else if((allowIfPTDueExists=='false' && response.propertyDetails.taxDue > 0) || waterTaxDue > 0) {
 						bootbox.alert(errorMessage);
 					}
 					else {					
@@ -329,4 +216,20 @@ function resetPropertyDetails() {
 	$('#locality').val('');
 	$('#zonewardblock').val('');
 	$('#propertytax').val('0.00');
+}
+
+function getWaterTaxDue(propertyID) {
+	if(propertyID != "") {
+		$.ajax({
+			url: "/stms/ajaxconnection/check-watertax-due",
+				type: "GET",
+				cache: true,
+				data: {
+					assessmentNo : propertyID
+				},
+				dataType: "json",
+		}).done(function(value) {
+			 return value;
+		});
+	}
 }

@@ -44,7 +44,7 @@ public class SewerageTaxConstants {
     public static final String FILESTORE_MODULECODE = "STMS";
     public static final String MODULE_NAME = "Sewerage Tax Management";
     public static final String APPLICATION_NUMBER = "applicationNumber";
-    public static final String NEWCONNECTION = "NEWCONNECTION";
+    public static final String NEWSEWERAGECONNECTION = "NEWSEWERAGECONNECTION";
     public static final String MODULETYPE = "WATERTAXAPPLICATION";
     
     // appconfig keys

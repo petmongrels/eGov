@@ -98,7 +98,7 @@
 	</div>
 </div>
 
-<script src="<c:url value='/resources/js/app/applicationsuccess.js?rnd=${app_release_no}'/>"></script>
+<script src="<c:url value='/resources/js/transactions/applicationsuccess.js?rnd=${app_release_no}'/>"></script>
 <script type="text/javascript">
 function printDiv(divName) {
     var printContents = document.getElementById(divName).innerHTML;

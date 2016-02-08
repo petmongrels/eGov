@@ -67,14 +67,9 @@
 				<div class="panel-body custom-form ">
 					<jsp:include page="applicantdetails.jsp"></jsp:include>
 					<jsp:include page="connectiondetails.jsp"></jsp:include>	
-					<%-- <jsp:include page="documentdetails.jsp"></jsp:include>	 --%>
 				</div>
 			</div>			
 			
-			<%-- <jsp:include page="../common/commonWorkflowMatrix.jsp"/>
-				<div class="buttonbottom" align="center">
-					<jsp:include page="../common/commonWorkflowMatrix-button.jsp" />
-				</div> --%>
 			<div class="buttonbottom" align="center">
 				<input type="submit" class="btn btn-primary" value="Submit" />
 				<input type="button" name="button2" id="button2" value="Close"
@@ -84,5 +79,5 @@
 	</div>
 </div>
 
-<script src="<c:url value='/resources/js/app/newconnection.js?rnd=${app_release_no}'/>"></script>
+<script src="<c:url value='/resources/js/transactions/newconnection.js?rnd=${app_release_no}'/>"></script>
 <script src="<c:url value='/resources/global/js/egov/inbox.js' context='/egi'/>"></script>
