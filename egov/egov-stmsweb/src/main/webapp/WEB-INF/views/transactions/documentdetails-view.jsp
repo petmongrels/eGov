@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+<!-- #-------------------------------------------------------------------------------
 # eGov suite of products aim to improve the internal efficiency,transparency, 
 #    accountability and the service delivery of the government  organizations.
 # 
@@ -36,14 +36,48 @@
 # 	   or trademarks of eGovernments Foundation.
 # 
 #   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------- -->
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-err.validate.property.taxdue=Property tax is due with Rs. {0}/- for the assessment no {1}, please pay the due amount to create {2} sewerage connection
-err.validate.newconnection.active=Sewerage connection with D.H.S.C Number {0} is already present for the property ID: {1}.
-err.validate.newconnection.application.inprocess=New Sewerage connection for property ID: {0} is applied with application number: {1} and is under processing. Please check the status of application in application status screen.
-err.validate.newconnection.disconnected=Sewerage connection with D.H.S.C Number {0} for the property ID: {1} is in Disconnection status. Please request the user to submit the application for reconnection.
-err.validate.newconnection.holding=Sewerage connection with D.H.S.C Number {0} for the property ID: {1} is in Holding connection status. Please request the user to submit the application for reconnection.
-err.validate.newconnection.closed=Sewerage connection with D.H.S.C Number {0} for the property ID: {1} is in Closed status. Please request the user to submit the application for reconnection.
-err.validate.newconnection.inactive=Sewerage connection with D.H.S.C Number {0} for the property ID: {1} is in Inactive connection status. Please request the user to submit the application for activation.
-approvalNumber.required=Approval Number is required
-approvalDate.required=Approval Date is required
+<table class="table table-bordered">
+<c:if test="${not empty applicationDocList}">
+	<thead>
+		<tr>
+			<th><spring:message code="lbl.slno" /></th>
+			<th><spring:message code="lbl.documentname" /></th>
+			<th><spring:message code="lbl.documentnumber" /></th>
+			<th><spring:message code="lbl.documentdate" /></th>
+			<c:if test="${mode!='ack'}">
+				<th><spring:message code="lbl.files"/></th>
+			</c:if>
+		</tr>
+	</thead>
+	</c:if>
+	<c:choose>
+		<c:when test="${not empty applicationDocList}">
+			<c:forEach items="${applicationDocList}" var="docs" varStatus="serialNo">
+				<tbody>
+					<tr>
+						<td><c:out value="${serialNo.count}"/></td>
+						<td><c:out value="${docs.documentNames.documentName}" /></td>
+						<td><c:out value="${docs.documentNumber}" /></td>
+						<td><fmt:formatDate pattern="dd/MM/yyyy" value="${docs.documentDate}" var="docsDate"/><c:out value="${docsDate}" /></td>
+						<c:if test="${mode!='ack'}">
+						<td><c:forEach items="${docs.getSupportDocs()}" var="file">
+								<a href="/egi/downloadfile?fileStoreId=${file.fileStoreId}&moduleName=WTMS" target="_blank"> 
+								<c:out value="${file.fileName}"/></a>
+							</c:forEach>
+						</td>
+						</c:if>
+					</tr>
+				</tbody>
+			</c:forEach>
+		</c:when>
+		<c:otherwise>
+			<div class="col-md-12 col-xs-6  panel-title">No documents found</div>
+		</c:otherwise>
+	</c:choose>
+</table>

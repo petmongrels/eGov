@@ -53,11 +53,11 @@ import org.egov.infra.reporting.engine.ReportService;
 import org.egov.ptis.domain.model.AssessmentDetails;
 import org.egov.ptis.domain.model.OwnerName;
 import org.egov.ptis.domain.service.property.PropertyExternalService;
-
 import org.egov.stms.transactions.entity.SewerageApplicationDetails;
 import org.egov.stms.transactions.service.SewerageApplicationDetailsService;
+import org.egov.stms.utils.SewerageTaxUtils;
+import org.egov.stms.utils.constants.SewerageTaxConstants;
 import org.egov.wtms.utils.PropertyExtnUtils;
-import org.egov.wtms.utils.constants.WaterTaxConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -69,15 +69,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(value = "/application")
-public class EstimationNoticeController {
+@RequestMapping(value = "/transactions")
+public class SewerageEstimationNoticeController {
 
     @Autowired
     private ReportService reportService;
 
-    public static final String ESTIMATION_NOTICE = "estimationNotice";
     @Autowired
-    private PropertyExtnUtils propertyExtnUtils;
+    private SewerageTaxUtils sewerageTaxUtils;
+
+    public static final String ESTIMATION_NOTICE = "estimationNotice";
     private final Map<String, Object> reportParams = new HashMap<String, Object>();
     private ReportRequest reportInput = null;
     private ReportOutput reportOutput = null;
@@ -97,8 +98,8 @@ public class EstimationNoticeController {
             final HttpSession session) {
         if (sewerageApplicationDetails != null) {
             final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-            final AssessmentDetails assessmentDetails = propertyExtnUtils.getAssessmentDetailsForFlag(
-                    sewerageApplicationDetails.getApplicationNumber(),
+            final AssessmentDetails assessmentDetails = sewerageTaxUtils.getAssessmentDetailsForFlag(
+                    sewerageApplicationDetails.getConnection().getPropertyIdentifier(),
                     PropertyExternalService.FLAG_FULL_DETAILS);
             String doorNo[] = null;
             if (null != assessmentDetails.getPropertyAddress())
@@ -110,11 +111,8 @@ public class EstimationNoticeController {
                     break;
                 }
 
-            if (WaterTaxConstants.NEWCONNECTION.equalsIgnoreCase(sewerageApplicationDetails.getApplicationType().getCode()))
-                reportParams.put("applicationType",
-                        WordUtils.capitalize(sewerageApplicationDetails.getApplicationType().getName()).toString());
-            else if (WaterTaxConstants.ADDNLCONNECTION
-                    .equalsIgnoreCase(sewerageApplicationDetails.getApplicationType().getCode()))
+            if (SewerageTaxConstants.NEWSEWERAGECONNECTION.equalsIgnoreCase(sewerageApplicationDetails.getApplicationType()
+                    .getCode()))
                 reportParams.put("applicationType",
                         WordUtils.capitalize(sewerageApplicationDetails.getApplicationType().getName()).toString());
             else

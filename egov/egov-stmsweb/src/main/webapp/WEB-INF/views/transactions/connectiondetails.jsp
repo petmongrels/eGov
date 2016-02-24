@@ -58,8 +58,6 @@
 			<c:forEach items="${propertyTypes}" var="entry">
 		        <option value="${entry}">${entry}</option>
 		    </c:forEach>
-			<%-- <form:options items="${propertyTypes}" itemValue="key"
-				itemLabel="value" /> --%>
 		</form:select>		
 		<form:errors path="connection.propertyType" cssClass="add-margin error-msg" />					
 	</div>
@@ -78,5 +76,13 @@
 			<form:errors path="connection.noOfClosetsNonResidential" cssClass="add-margin error-msg" />		
 		</div>
 </div>
-
-<form:hidden id="typeOfConnection" path="" value="${typeOfConnection}"/>		
+<c:if test="${sewerageApplicationDetails.fileStore != null}">
+	<div class="panel-footer"><spring:message
+		code="lbl.fileattached" /></div>
+	<div>
+		<a href="/stms/transactions/downloadFile?applicationNumber=${sewerageApplicationDetails.applicationNumber }">${sewerageApplicationDetails.fileStore.fileName }</a>
+	</div>
+</c:if>
+<script type="text/javascript">
+	$propType = "${sewerageApplicationDetails.connection.propertyType }";
+</script>

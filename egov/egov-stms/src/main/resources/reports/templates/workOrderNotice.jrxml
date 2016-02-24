@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.2.0.final using JasperReports Library version 6.2.0  -->
-<!-- 2015-12-18T19:22:13 -->
+<!-- 2016-02-23T17:45:42 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="test" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="cee583e3-a0f8-4d29-92e7-b2c0afa5f324">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
@@ -86,7 +86,7 @@
 				<textElement verticalAlignment="Middle" markup="styled">
 					<font size="8" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style forecolor=\"#000000\" isBold=\"true\" pdfFontName=\"Times-Bold\" pdfEncoding=\"Cp1252\" isPdfEmbedded=\"true\">Water Supply - "+$P{municipality}+", Work order for fixing of water tap</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["<style forecolor=\"#000000\" isBold=\"true\" pdfFontName=\"Times-Bold\" pdfEncoding=\"Cp1252\" isPdfEmbedded=\"true\">Water Supply - "+$P{municipality}+", Work order for new Sewerage Connection</style>"]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="29" y="130" width="42" height="15" uuid="3c551f20-c6f7-44df-a210-5fbd222c62bc"/>
@@ -237,7 +237,7 @@
 				<textElement verticalAlignment="Middle" markup="styled">
 					<font size="8" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style forecolor=\"#000000\" isBold=\"true\" pdfFontName=\"Times-Bold\" pdfEncoding=\"Cp1252\" isPdfEmbedded=\"true\">Water Supply - "+$P{municipality}+", Work order for fixing of water tap</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["<style forecolor=\"#000000\" isBold=\"true\" pdfFontName=\"Times-Bold\" pdfEncoding=\"Cp1252\" isPdfEmbedded=\"true\">Water Supply - "+$P{municipality}+", Work order for new Sewerage Connection</style>"]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy">
 				<reportElement x="34" y="545" width="491" height="15" uuid="f6611217-63f4-44f8-872b-8ce7291e46c2"/>

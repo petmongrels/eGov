@@ -59,6 +59,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -136,6 +137,12 @@ public class SewerageApplicationDetails extends StateAware {
     @OrderBy("id desc")
     @OneToOne(mappedBy = "applicationDetails", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private SewerageFieldInspectionDetails fieldInspectionDetails;
+    
+    @Transient
+    private Long approvalDepartment;
+
+    @Transient
+    private String approvalComent;
 
     @Override
     public Long getId() {
@@ -257,6 +264,22 @@ public class SewerageApplicationDetails extends StateAware {
 
     public void setFieldInspectionDetails(final SewerageFieldInspectionDetails fieldInspectionDetails) {
         this.fieldInspectionDetails = fieldInspectionDetails;
+    }
+    
+    public Long getApprovalDepartment() {
+        return approvalDepartment;
+    }
+
+    public void setApprovalDepartment(Long approvalDepartment) {
+        this.approvalDepartment = approvalDepartment;
+    }
+
+    public String getApprovalComent() {
+        return approvalComent;
+    }
+
+    public void setApprovalComent(String approvalComent) {
+        this.approvalComent = approvalComent;
     }
 
     @Override

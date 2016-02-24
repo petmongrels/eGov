@@ -37,6 +37,7 @@
 # 
 #   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
 #------------------------------------------------------------------------------- -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <div class="form-group">
@@ -44,10 +45,18 @@
 			code="lbl.ptassesmentnumber" /><span class="mandatory"></span></label>
 	<div class="col-sm-3 add-margin">
 		<div class="input-group">
-			<form:input id="propertyIdentifier" path="connection.propertyIdentifier" class="form-control patternvalidation" data-pattern="number" maxlength="15" min="3" required="required" /> 
-			<span class="input-group-addon"> <i class="fa fa-search specific"></i></span>
+			<c:choose>
+				<c:when test="${mode != null && mode.equals('edit')}">
+					<form:input id="propertyIdentifier" path="connection.propertyIdentifier" class="form-control patternvalidation" data-pattern="number" disabled="true" />
+					<span class="input-group-addon"> <i class="fa fa-search specific"></i></span>
+				</c:when>
+				<c:otherwise>
+					<form:input id="propertyIdentifier" path="connection.propertyIdentifier" class="form-control patternvalidation" data-pattern="number" maxlength="15" min="3" required="required" />
+					<span class="input-group-addon"> <i class="fa fa-search specific"></i></span>
+					<form:errors path="connection.propertyIdentifier" id="propertyIdentifierError" cssClass="add-margin error-msg" />
+				</c:otherwise>
+			</c:choose>
 		</div>
-		<form:errors path="connection.propertyIdentifier" id="propertyIdentifierError" cssClass="add-margin error-msg" />
 	</div>
 	<label class="col-sm-2 control-label text-right"><spring:message
 			code="lbl.applicantname" /></label>

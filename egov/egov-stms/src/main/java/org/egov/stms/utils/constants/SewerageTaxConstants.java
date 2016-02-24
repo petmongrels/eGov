@@ -45,13 +45,56 @@ public class SewerageTaxConstants {
     public static final String MODULE_NAME = "Sewerage Tax Management";
     public static final String APPLICATION_NUMBER = "applicationNumber";
     public static final String NEWSEWERAGECONNECTION = "NEWSEWERAGECONNECTION";
-    public static final String MODULETYPE = "WATERTAXAPPLICATION";
-    
+    public static final String MODULETYPE = "SEWERAGETAXAPPLICATION";
+
     // appconfig keys
     public static final String NEWCONNECTIONALLOWEDIFPTDUE = "NEWCONNECTIONALLOWEDIFPTDUE";
-    public static final String DOCUMENTREQUIREDFORBPL = "DOCUMENTREQUIREDFORBPL";
-    public static final String MULTIPLENEWCONNECTIONFORPID = "MULTIPLENEWCONNECTIONFORPID";
-    
+
     // application constants
     public static final String APPLICATION_STATUS_CREATED = "CREATED";
+    public static final String APPLICATION_STATUS_CHECKED = "CHECKED";
+    public static final String APPLICATION_STATUS_APPROVED = "APPROVED";
+    public static final String APPLICATION_STATUS_VERIFIED = "VERIFIED";
+    public static final String APPLICATION_STATUS_ESTIMATENOTICEGEN = "ESTIMATIONNOTICEGENERATED";
+    public static final String APPLICATION_STATUS_FEEPAID = "ESTIMATIONAMOUNTPAID";
+    public static final String APPLICATION_STATUS_WOGENERATED = "WORKORDERGENERATED";
+    public static final String APPLICATION_STATUS_CANCELLED = "CANCELLED";
+    public static final String APPLICATION_STATUS_SANCTIONED = "SANCTIONED";
+    public static final String APPLICATION_STATUS_CLERKAPPROVED = "Clerk approved";
+
+    public static final String CLERKDESIGNATIONFORCSCOPERATOR = "CLERKDESIGNATIONFORCSCOPERATOR";
+    public static final String SEWERAGETAXWORKFLOWDEPARTEMENT = "DEPARTMENTFORWORKFLOW";
+
+    public static final String WORKFLOWTYPE_DISPLAYNAME = "Sewerage Connection";
+
+    public static final String WF_STATE_REJECTED = "Rejected";
+    public static final String WFLOW_ACTION_STEP_REJECT = "Reject";
+
+    public static final String WF_STATE_CLERK_APPROVED = "Clerk approved";
+    public static final String WF_STATE_DEPUTY_EXE_APPROVED = "Deputy executive engineer approved";
+    public static final String WF_STATE_ASSISTANT_APPROVED = "Assistant Engineer approved";
+
+    // designations
+    public static final String DESIGNATION_DEPUTY_EXE_ENGINEER = "deputy executive engineer";
+    public static final String DESIGNATION_EXE_ENGINEER = "executive engineer";
+
+    // User roles
+    public static final String ROLE_SUPERUSER = "Super User";
+    public static final String ROLE_EXECUTIVEDEPARTEMNT = "Engineering";
+    public static final String ROLE_DEPUTYDEPARTEMNT = "Engineering";
+
+    public static final String MODE = "mode";
+    public static final String APPROVAL_POSITION = "approvalPosition";
+    public static final String APPROVAL_COMMENT = "approvalComment";
+    public static final String WORKFLOW_ACTION = "workFlowAction";
+
+    public static final String SUBMITWORKFLOWACTION = "Submit";
+    public static final String APPROVEWORKFLOWACTION = "Approve";
+
+    public static final String WF_ESTIMATION_NOTICE_BUTTON = "Generate Estimation Notice";
+    public static final String WF_STATE_CONNECTION_EXECUTION_BUTTON = "Execute Connection";
+    public static final String WF_CLOSERACKNOWLDGEENT_BUTTON = "Generate Acknowledgement";
+    public static final String WF_WORKORDER_BUTTON = "Generate Work Order";
+
+    public static final String PREVIEWWORKFLOWACTION = "Preview";
 }

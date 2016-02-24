@@ -39,64 +39,38 @@
 #-------------------------------------------------------------------------------*/
 $(document).ready(function(){
 	
-	$('#propertyType option').each(function() {
-	    var $this = $(this);
-	    $this.text($this.text().replace(/_/g, ' '));
+	var fileformatsinclude = ['doc','docx','xls','xlsx','rtf','pdf','jpeg','jpg','png','txt','xml']; 
+	
+	$('.upload-file').change(function(e){		
+		/*validation for file upload*/
+		myfile= $( this ).val();
+		var ext = myfile.split('.').pop();
+		if($.inArray(ext.toLowerCase(), fileformatsinclude) > -1){
+			//do something    
+		}
+		else{
+			bootbox.alert("Please upload .doc, .docx, .xls, .xlsx, .rtf, .pdf, jpeg, .jpg, .png, .txt and .xml format documents only");
+			$( this ).val('');
+			return false;
+		}	
+		
+		var fileInput = $(this);
+   		var maxSize = 2097152; //file size  in bytes(2MB)
+		var inMB = maxSize/1024/1024;
+		if(fileInput.get(0).files.length){
+			var fileSize = this.files[0].size; // in bytes
+			var charlen = (this.value.split('/').pop().split('\\').pop()).length;
+			if(charlen > 50){
+				bootbox.alert('File length should not exceed 50 characters!');
+				fileInput.replaceWith(fileInput.val('').clone(true));
+				return false;			
+			} 
+			else if(fileSize > maxSize){
+				bootbox.alert('File size should not exceed '+ inMB +' MB!');
+				fileInput.replaceWith(fileInput.val('').clone(true));
+				return false;
+			}			
+		}
 	});
 	
-	$('#propertyType').change(function(){
-		var propertyType = $(this).val();
-		if(propertyType == '') {
-			$('#lblResidential').hide();
-			$('#lblNonResidential').hide();
-			$('#valResidential').hide();
-			$('#valNonResidential').hide();
-			
-			$('#noOfClosetsResidential').val('');
-			$('#noOfClosetsNonResidential').val('');
-		} else if(propertyType == 'RESIDENTIAL') {
-			$('#lblNonResidential').removeClass('col-sm-3');
-			$('#lblNonResidential').addClass('col-sm-2');
-			
-			$('#lblResidential').show();
-			$('#lblNonResidential').hide();
-			$('#valResidential').show();
-			$('#valNonResidential').hide();
-			
-			$('#noOfClosetsNonResidential').val('');
-			
-			$('#valResidential input').attr('required','required');
-			$('#valNonResidential input').removeAttr("required");
-		} else if(propertyType == 'NON_RESIDENTIAL') {
-			$('#lblNonResidential').removeClass('col-sm-2');
-			$('#lblNonResidential').addClass('col-sm-3');
-			
-			$('#lblResidential').hide();
-			$('#lblNonResidential').show();
-			$('#valResidential').hide();
-			$('#valNonResidential').show();
-			
-			$('#noOfClosetsResidential').val('');
-			
-			$('#valNonResidential input').attr('required','required');
-			$('#valResidential input').removeAttr("required");
-		} else if(propertyType == 'MIXED') {
-			$('#lblNonResidential').removeClass('col-sm-3');
-			$('#lblNonResidential').addClass('col-sm-2');
-			
-			$('#lblResidential').show();
-			$('#lblNonResidential').show();
-			$('#valResidential').show();
-			$('#valNonResidential').show();
-			
-			$('#valResidential input').attr('required','required');
-			$('#valNonResidential input').attr('required','required');
-		}
- });
-	
-	if($propType != "" || $propType != null) {
-		$propType = $propType.replace(/ /g, '_');
-		$('#propertyType').val($propType);
-		$('#propertyType').trigger("change");
-	}
 });

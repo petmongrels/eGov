@@ -45,7 +45,6 @@ import java.util.List;
 import org.egov.demand.model.EgDemand;
 import org.egov.stms.transactions.entity.SewerageConnection;
 import org.egov.stms.transactions.repository.SewerageConnectionRepository;
-import org.egov.wtms.application.service.ConnectionDemandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -59,8 +58,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class SewerageConnectionService {
 
     private final SewerageConnectionRepository sewerageConnectionRepository;
-
-    private ConnectionDemandService connectionDemandService;
 
     @Autowired
     public SewerageConnectionService(final SewerageConnectionRepository sewerageConnectionRepository) {
@@ -95,17 +92,13 @@ public class SewerageConnectionService {
     public BigDecimal getTotalAmount(final SewerageConnection sewerageConnection) {
         final EgDemand currentDemand = sewerageConnection.getDemand();
         BigDecimal balance = BigDecimal.ZERO;
-        if (currentDemand != null) {
-            final List<Object> instVsAmt = connectionDemandService.getDmdCollAmtInstallmentWise(currentDemand);
-            for (final Object object : instVsAmt) {
-                final Object[] ddObject = (Object[]) object;
-                final BigDecimal dmdAmt = (BigDecimal) ddObject[2];
-                BigDecimal collAmt = BigDecimal.ZERO;
-                if (ddObject[2] != null)
-                    collAmt = new BigDecimal((Double) ddObject[3]);
-                balance = balance.add(dmdAmt.subtract(collAmt));
-            }
-        }
+        /*
+         * if (currentDemand != null) { final List<Object> instVsAmt =
+         * connectionDemandService.getDmdCollAmtInstallmentWise(currentDemand); for (final Object object : instVsAmt) { final
+         * Object[] ddObject = (Object[]) object; final BigDecimal dmdAmt = (BigDecimal) ddObject[2]; BigDecimal collAmt =
+         * BigDecimal.ZERO; if (ddObject[2] != null) collAmt = new BigDecimal((Double) ddObject[3]); balance =
+         * balance.add(dmdAmt.subtract(collAmt)); } }
+         */
         return balance;
     }
 }

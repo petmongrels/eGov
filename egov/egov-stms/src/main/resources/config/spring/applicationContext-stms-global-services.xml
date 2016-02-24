@@ -45,4 +45,12 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-lazy-init="true">
 	
 	<context:component-scan base-package="org.egov.stms" />
+	<bean id="SewerageApplicationDetailsPersistenceService" parent="persistenceService">
+        <property name="type" value="org.egov.stms.transactions.entity.SewerageApplicationDetails" />
+    </bean>
+    <bean id="SewerageApplicationDetailsInboxRenderService" class="org.egov.infra.workflow.inbox.DefaultInboxRenderServiceImpl">
+         <constructor-arg index="0" ref="SewerageApplicationDetailsPersistenceService"/>
+    </bean>
+    
+    <bean id="seweargeApplicationWorkflowCustomDefaultImpl" class="org.egov.stms.transactions.workflow.ApplicationWorkflowCustomDefaultImpl" scope="prototype" />
 </beans>

@@ -39,12 +39,35 @@
  */
 package org.egov.stms.utils;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.egov.commons.EgwStatus;
+import org.egov.eis.entity.Assignment;
+import org.egov.eis.service.AssignmentService;
+import org.egov.eis.service.DesignationService;
+import org.egov.eis.service.PositionMasterService;
 import org.egov.infra.admin.master.entity.AppConfigValues;
+import org.egov.infra.admin.master.entity.Boundary;
+import org.egov.infra.admin.master.entity.Department;
+import org.egov.infra.admin.master.entity.Role;
+import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.admin.master.service.AppConfigValueService;
+import org.egov.infra.admin.master.service.BoundaryService;
+import org.egov.infra.admin.master.service.CityService;
+import org.egov.infra.admin.master.service.DepartmentService;
+import org.egov.infra.admin.master.service.UserService;
+import org.egov.infra.utils.EgovThreadLocals;
+import org.egov.infra.workflow.entity.State;
+import org.egov.infra.workflow.entity.StateHistory;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.pims.commons.Designation;
+import org.egov.pims.commons.Position;
 import org.egov.ptis.domain.model.AssessmentDetails;
+import org.egov.ptis.domain.service.property.PropertyExternalService;
 import org.egov.ptis.wtms.PropertyIntegrationService;
+import org.egov.stms.transactions.entity.SewerageApplicationDetails;
 import org.egov.stms.utils.constants.SewerageTaxConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -64,6 +87,27 @@ public class SewerageTaxUtils {
     @Qualifier("propertyIntegrationServiceImpl")
     private PropertyIntegrationService propertyIntegrationService;
 
+    @Autowired
+    private AssignmentService assignmentService;
+
+    @Autowired
+    private BoundaryService boundaryService;
+
+    @Autowired
+    private DepartmentService departmentService;
+
+    @Autowired
+    private DesignationService designationService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private PositionMasterService positionMasterService;
+
+    @Autowired
+    private CityService cityService;
+
     public Boolean isNewConnectionAllowedIfPTDuePresent() {
         AppConfigValues appConfigValue = null;
         if (appConfigValuesService.getConfigValuesByModuleAndKey(
@@ -77,18 +121,6 @@ public class SewerageTaxUtils {
         return "YES".equalsIgnoreCase(appConfigValue.getValue());
     }
 
-    public Boolean isMultipleNewConnectionAllowedForPID() {
-        AppConfigValues appConfigValue = null;
-        if (appConfigValuesService.getConfigValuesByModuleAndKey(
-                SewerageTaxConstants.MODULE_NAME, SewerageTaxConstants.MULTIPLENEWCONNECTIONFORPID).size() == 0) {
-            appConfigValue = new AppConfigValues();
-            appConfigValue.setValue("NO");
-        } else
-            appConfigValue = appConfigValuesService.getConfigValuesByModuleAndKey(
-                    SewerageTaxConstants.MODULE_NAME, SewerageTaxConstants.MULTIPLENEWCONNECTIONFORPID).get(0);
-        return "YES".equalsIgnoreCase(appConfigValue.getValue());
-    }
-
     public EgwStatus getStatusByCodeAndModuleType(final String code, final String moduleName) {
         return (EgwStatus) persistenceService.find("from EgwStatus where moduleType=? and code=?", moduleName, code);
     }
@@ -97,5 +129,208 @@ public class SewerageTaxUtils {
         final AssessmentDetails assessmentDetails = propertyIntegrationService.getAssessmentDetailsForFlag(asessmentNumber,
                 flagDetail);
         return assessmentDetails;
+    }
+
+    public Boolean getCurrentUserRole(final User currentUser) {
+        /*
+         * Boolean applicationByOthers = false; for (final Role userrole : currentUser.getRoles()) for (final AppConfigValues
+         * appconfig : getThirdPartyUserRoles()) if (userrole != null && userrole.getName().equals(appconfig.getValue())) {
+         * applicationByOthers = true; break; } return applicationByOthers;
+         */
+        return true;
+    }
+
+    public String getApproverName(final Long approvalPosition) {
+        Assignment assignment = null;
+        List<Assignment> asignList = null;
+        if (approvalPosition != null)
+            assignment = assignmentService.getPrimaryAssignmentForPositionAndDate(approvalPosition, new Date());
+        if (assignment != null)
+        {
+            asignList = new ArrayList<Assignment>();
+            asignList.add(assignment);
+        }
+        else if (assignment == null)
+        {
+            asignList = assignmentService.getAssignmentsForPosition(approvalPosition, new Date());
+        }
+        return !asignList.isEmpty() ? asignList.get(0).getEmployee().getName() : "";
+    }
+
+    public Position getZonalLevelClerkForLoggedInUser(final String asessmentNumber) {
+        final AssessmentDetails assessmentDetails = getAssessmentDetailsForFlag(asessmentNumber,
+                PropertyExternalService.FLAG_FULL_DETAILS);
+        Assignment assignmentObj = null;
+        final Boundary boundaryObj = boundaryService.getBoundaryById(assessmentDetails.getBoundaryDetails()
+                .getAdminWardId());
+        assignmentObj = getUserPositionByZone(asessmentNumber, assessmentDetails, boundaryObj);
+
+        return assignmentObj != null ? assignmentObj.getPosition() : null;
+    }
+
+    /**
+     * Getting User assignment based on designation ,department and zone boundary Reading Designation and Department from
+     * appconfig values and Values should be 'Senior Assistant,Junior Assistant' for designation and
+     * 'Revenue,Accounts,Administration' for department
+     *
+     * @param asessmentNumber ,
+     * @Param assessmentDetails
+     * @param boundaryObj
+     * @return Assignment
+     */
+    public Assignment getUserPositionByZone(final String asessmentNumber, final AssessmentDetails assessmentDetails,
+            final Boundary boundaryObj) {
+        final String designationStr = getDesignationForThirdPartyUser();
+        final String departmentStr = getDepartmentForWorkFlow();
+        final String[] department = departmentStr.split(",");
+        final String[] designation = designationStr.split(",");
+        List<Assignment> assignment = new ArrayList<Assignment>();
+        for (final String dept : department) {
+            for (final String desg : designation) {
+                assignment = assignmentService.findByDepartmentDesignationAndBoundary(departmentService
+                        .getDepartmentByName(dept).getId(), designationService.getDesignationByName(desg).getId(),
+                        boundaryObj.getId());
+                if (!assignment.isEmpty())
+                    break;
+            }
+            if (!assignment.isEmpty())
+                break;
+        }
+        return !assignment.isEmpty() ? assignment.get(0) : null;
+    }
+
+    public String getDesignationForThirdPartyUser() {
+        String designation = "";
+        final List<AppConfigValues> appConfigValue = appConfigValuesService.getConfigValuesByModuleAndKey(
+                SewerageTaxConstants.MODULE_NAME, SewerageTaxConstants.CLERKDESIGNATIONFORCSCOPERATOR);
+        if (null != appConfigValue && !appConfigValue.isEmpty())
+            designation = appConfigValue.get(0).getValue();
+        return designation;
+    }
+
+    public String getDepartmentForWorkFlow() {
+        String department = "";
+        final List<AppConfigValues> appConfigValue = appConfigValuesService.getConfigValuesByModuleAndKey(
+                SewerageTaxConstants.MODULE_NAME, SewerageTaxConstants.SEWERAGETAXWORKFLOWDEPARTEMENT);
+        if (null != appConfigValue && !appConfigValue.isEmpty())
+            department = appConfigValue.get(0).getValue();
+        return department;
+    }
+
+    public Long getApproverPosition(final String designationName, final SewerageApplicationDetails sewerageApplicationDetails) {
+        final List<StateHistory> stateHistoryList = sewerageApplicationDetails.getState().getHistory();
+        Long approverPosition = 0l;
+        final String[] desgnArray = designationName.split(",");
+        User currentUser = null;
+        if (stateHistoryList != null && !stateHistoryList.isEmpty()) {
+            currentUser = userService.getUserById(sewerageApplicationDetails.getCreatedBy().getId());
+            if (currentUser != null && sewerageApplicationDetails.getConnection().getLegacy()) {
+                for (final Role userrole : currentUser.getRoles())
+                    if (userrole.getName().equals(SewerageTaxConstants.ROLE_SUPERUSER)) {
+                        final Position positionuser = getZonalLevelClerkForLoggedInUser(
+                                sewerageApplicationDetails.getConnection().getPropertyIdentifier());
+                        approverPosition = positionuser.getId();
+                        break;
+                    }
+            } else {
+                for (final StateHistory stateHistory : stateHistoryList)
+                    if (stateHistory.getOwnerPosition() != null) {
+                        final List<Assignment> assignmentList = assignmentService.getAssignmentsForPosition(
+                                stateHistory.getOwnerPosition().getId(), new Date());
+                        for (final Assignment assgn : assignmentList)
+                            for (final String str : desgnArray)
+                                if (assgn.getDesignation().getName().equalsIgnoreCase(str)) {
+                                    approverPosition = stateHistory.getOwnerPosition().getId();
+                                    break;
+                                }
+
+                    }
+                if (approverPosition == 0) {
+                    final State stateObj = sewerageApplicationDetails.getState();
+                    final List<Assignment> assignmentList = assignmentService.getAssignmentsForPosition(stateObj
+                            .getOwnerPosition().getId(), new Date());
+                    for (final Assignment assgn : assignmentList)
+                        if (assgn.getDesignation().getName().equalsIgnoreCase(designationName)) {
+                            approverPosition = stateObj.getOwnerPosition().getId();
+                            break;
+                        }
+                }
+
+            }
+
+        } else {
+            currentUser = userService.getUserById(sewerageApplicationDetails.getCreatedBy().getId());
+            if (currentUser != null && sewerageApplicationDetails.getConnection().getLegacy()) {
+                for (final Role userrole : currentUser.getRoles())
+                    if (userrole.getName().equals(SewerageTaxConstants.ROLE_SUPERUSER)) {
+                        final Position positionuser = getZonalLevelClerkForLoggedInUser(
+                                sewerageApplicationDetails.getConnection().getPropertyIdentifier());
+                        approverPosition = positionuser.getId();
+                        break;
+                    }
+            } else {
+                final Position posObjToClerk = positionMasterService
+                        .getCurrentPositionForUser(sewerageApplicationDetails.getCreatedBy().getId());
+                approverPosition = posObjToClerk.getId();
+            }
+        }
+        return approverPosition;
+    }
+
+    public Position getCityLevelExecutiveEngineerPosition(final String execEnggDesgn) {
+        String execEnggDesgnName = "";
+        final String[] degnName = execEnggDesgn.split(",");
+        if (degnName.length > 1)
+            execEnggDesgnName = degnName[0];
+        else
+            execEnggDesgnName = execEnggDesgn;
+        final Designation desgnObj = designationService.getDesignationByName(execEnggDesgn);
+        if (execEnggDesgn.equals("Executive engineer")) {
+            final Department deptObj = departmentService.getDepartmentByName(SewerageTaxConstants.ROLE_EXECUTIVEDEPARTEMNT);
+            List<Assignment> assignlist = null;
+            assignlist = assignmentService.getAssignmentsByDeptDesigAndDates(deptObj.getId(), desgnObj.getId(), new Date(),
+                    new Date());
+            if (assignlist.isEmpty())
+                assignlist = assignmentService.getAllPositionsByDepartmentAndDesignationForGivenRange(null, desgnObj.getId(),
+                        new Date());
+            if (assignlist.isEmpty())
+                assignlist = assignmentService.getAllActiveAssignments(desgnObj.getId());
+
+            return assignlist.get(0).getPosition();
+        } else
+            return !assignmentService.findPrimaryAssignmentForDesignationName(execEnggDesgnName).isEmpty() ? assignmentService
+                    .findPrimaryAssignmentForDesignationName(execEnggDesgnName).get(0).getPosition()
+                    : null;
+    }
+
+    public Position getCityLevelDeputyEngineerPosition(final String deputyEngineerDesgn) {
+        String deputydesgnname = "";
+        final String[] degnName = deputyEngineerDesgn.split(",");
+        if (degnName.length > 1)
+            deputydesgnname = degnName[0];
+        else
+            deputydesgnname = deputyEngineerDesgn;
+        final Designation desgnObj = designationService.getDesignationByName(deputyEngineerDesgn);
+        if (deputyEngineerDesgn.equalsIgnoreCase("Deputy executive engineer")) {
+            final Department deptObj = departmentService
+                    .getDepartmentByName(SewerageTaxConstants.ROLE_DEPUTYDEPARTEMNT);
+            List<Assignment> assignlist = null;
+            assignlist = assignmentService.getAssignmentsByDeptDesigAndDates(deptObj.getId(), desgnObj.getId(), new Date(),
+                    new Date());
+            if (assignlist.isEmpty())
+                assignlist = assignmentService.getAllPositionsByDepartmentAndDesignationForGivenRange(null, desgnObj.getId(),
+                        new Date());
+            if (assignlist.isEmpty())
+                assignlist = assignmentService.getAllActiveAssignments(desgnObj.getId());
+
+            return assignlist.get(0).getPosition();
+        } else
+            return !assignmentService.findPrimaryAssignmentForDesignationName(deputydesgnname).isEmpty() ? assignmentService
+                    .findPrimaryAssignmentForDesignationName(deputydesgnname).get(0).getPosition()
+                    : null;
+    }
+
+    public String getCityCode() {
+        return cityService.getCityByURL(EgovThreadLocals.getDomainName()).getCode();
     }
 }

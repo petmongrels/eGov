@@ -67,17 +67,35 @@
 				<div class="panel-body custom-form ">
 					<jsp:include page="applicantdetails.jsp"></jsp:include>
 					<jsp:include page="connectiondetails.jsp"></jsp:include>	
+					<%-- <jsp:include page="documentdetails.jsp"></jsp:include>	 --%>
+					<div class="form-group">
+						<div class="row">
+							<label class="col-sm-3 control-label text-right"><spring:message code="lbl.attachdocument"/></label>
+							<div class="col-sm-3 add-margin">
+								<input type="file" id="fileStoreId" name="files" class="file-ellipsis upload-file">
+								<div class="add-margin error-msg" ><font size="2">
+									<spring:message code="lbl.mesg.document"/>	
+									</font></div>
+							</div>
+						</div>
+				   </div>
 				</div>
 			</div>			
 			
+			<jsp:include page="../common/commonWorkflowMatrix.jsp"/>
 			<div class="buttonbottom" align="center">
+				<jsp:include page="../common/commonWorkflowMatrix-button.jsp" />
+			</div>
+			<!-- Not Required -->
+			<!-- <div class="buttonbottom" align="center">
 				<input type="submit" class="btn btn-primary" value="Submit" />
 				<input type="button" name="button2" id="button2" value="Close"
 				class="btn btn-default" onclick="window.close();" /></td>
-			</div>
+			</div> -->
 		</form:form>
 	</div>
 </div>
 
 <script src="<c:url value='/resources/js/transactions/newconnection.js?rnd=${app_release_no}'/>"></script>
 <script src="<c:url value='/resources/global/js/egov/inbox.js' context='/egi'/>"></script>
+<script src="<c:url value='/resources/js/transactions/documentsupload.js?rnd=${app_release_no}'/>"></script>

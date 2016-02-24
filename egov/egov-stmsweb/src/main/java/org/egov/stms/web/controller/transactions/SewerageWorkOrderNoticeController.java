@@ -56,8 +56,8 @@ import org.egov.ptis.domain.model.OwnerName;
 import org.egov.ptis.domain.service.property.PropertyExternalService;
 import org.egov.stms.transactions.entity.SewerageApplicationDetails;
 import org.egov.stms.transactions.service.SewerageApplicationDetailsService;
-import org.egov.wtms.utils.PropertyExtnUtils;
-import org.egov.wtms.utils.constants.WaterTaxConstants;
+import org.egov.stms.utils.SewerageTaxUtils;
+import org.egov.stms.utils.constants.SewerageTaxConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -72,8 +72,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(value = "/application")
-public class WorkOrderNoticeController {
+@RequestMapping(value = "/transactions")
+public class SewerageWorkOrderNoticeController {
 
     @Autowired
     private ReportService reportService;
@@ -81,9 +81,11 @@ public class WorkOrderNoticeController {
     @Autowired
     private ResourceBundleMessageSource messageSource;
 
-    public static final String WORKORDERNOTICE = "workOrderNotice";
     @Autowired
-    private PropertyExtnUtils propertyExtnUtils;
+    private SewerageTaxUtils sewerageTaxUtils;
+
+    public static final String WORKORDERNOTICE = "workOrderNotice";
+
     private final Map<String, Object> reportParams = new HashMap<String, Object>();
     private ReportRequest reportInput = null;
     private ReportOutput reportOutput = null;
@@ -108,8 +110,8 @@ public class WorkOrderNoticeController {
     private ResponseEntity<byte[]> generateReport(final SewerageApplicationDetails sewerageApplicationDetails,
             final HttpSession session) {
         if (null != sewerageApplicationDetails) {
-            final AssessmentDetails assessmentDetails = propertyExtnUtils.getAssessmentDetailsForFlag(
-                    sewerageApplicationDetails.getApplicationNumber(),
+            final AssessmentDetails assessmentDetails = sewerageTaxUtils.getAssessmentDetailsForFlag(
+                    sewerageApplicationDetails.getConnection().getPropertyIdentifier(),
                     PropertyExternalService.FLAG_FULL_DETAILS);
             final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
             final String doorno[] = assessmentDetails.getPropertyAddress().split(",");
@@ -119,33 +121,18 @@ public class WorkOrderNoticeController {
                 break;
             }
 
-            if (WaterTaxConstants.NEWCONNECTION.equalsIgnoreCase(sewerageApplicationDetails.getApplicationType().getCode()))
+            if (SewerageTaxConstants.NEWSEWERAGECONNECTION.equalsIgnoreCase(sewerageApplicationDetails.getApplicationType()
+                    .getCode()))
                 reportParams.put("conntitle",
                         WordUtils.capitalize(sewerageApplicationDetails.getApplicationType().getName()).toString());
-            // reportParams.put("applicationtype", messageSource.getMessage("msg.new.watertap.conn", null, null));
-            else if (WaterTaxConstants.ADDNLCONNECTION
-                    .equalsIgnoreCase(sewerageApplicationDetails.getApplicationType().getCode()))
-                reportParams.put("conntitle",
-                        WordUtils.capitalize(sewerageApplicationDetails.getApplicationType().getName()).toString());
-            // reportParams.put("applicationtype", messageSource.getMessage("msg.add.watertap.conn", null, null));
             else {
                 reportParams.put("conntitle",
                         WordUtils.capitalize(sewerageApplicationDetails.getApplicationType().getName()).toString());
-                reportParams.put("applicationtype", messageSource.getMessage("msg.changeofuse.watertap.conn", null, null));
             }
+            reportParams.put("applicationtype", messageSource.getMessage("msg.new.sewerage.conn", null, null));
             reportParams.put("municipality", session.getAttribute("citymunicipalityname"));
             reportParams.put("district", session.getAttribute("districtName"));
             reportParams.put("purpose", null);
-            /*
-             * if(null != workFlowAction) { if(workFlowAction.equalsIgnoreCase(WaterTaxConstants.WF_WORKORDER_BUTTON)) {
-             * reportParams.put("workorderdate", formatter.format(connectionDetails.getWorkOrderDate()));
-             * reportParams.put("workorderno", connectionDetails.getWorkOrderNumber()); }
-             * if(workFlowAction.equalsIgnoreCase(WaterTaxConstants.WF_PREVIEW_BUTTON)) { reportParams.put("workorderdate", "");
-             * reportParams.put("workorderno", ""); } if(workFlowAction.equalsIgnoreCase(WaterTaxConstants.WF_SIGN_BUTTON)) {
-             * reportParams.put("workorderdate", formatter.format(connectionDetails.getWorkOrderDate()));
-             * reportParams.put("workorderno", connectionDetails.getWorkOrderNumber()); User user =
-             * securityUtils.getCurrentUser(); reportParams.put("userId", user.getId()); } }
-             */
             reportParams.put("workorderdate", formatter.format(sewerageApplicationDetails.getWorkOrderDate()));
             reportParams.put("workorderno", sewerageApplicationDetails.getWorkOrderNumber());
             reportParams.put("workFlowAction", workFlowAction);
@@ -171,7 +158,7 @@ public class WorkOrderNoticeController {
             errorMessage = messageSource.getMessage("err.validate.workorder.view",
                     new String[] { sewerageApplicationDetails.getApplicationNumber() }, null);
         else if (!isView && !sewerageApplicationDetails.getStatus().getCode()
-                .equalsIgnoreCase(WaterTaxConstants.APPLICATION_STATUS_WOGENERATED))
+                .equalsIgnoreCase(SewerageTaxConstants.APPLICATION_STATUS_WOGENERATED))
             errorMessage = messageSource.getMessage("err.validate.workorder.view",
                     new String[] { sewerageApplicationDetails.getApplicationNumber() }, null);
     }

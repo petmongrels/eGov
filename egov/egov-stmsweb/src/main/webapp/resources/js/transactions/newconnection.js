@@ -40,61 +40,22 @@
 $(document).ready(function(){
 	
 	loadPropertyDetails();
-	var mode =$('#mode').val();
-	var validateIfPTDueExists=$('#validateIfPTDueExists').val();
-	var currentloggedInUser=$('#currentUser').val();
-	if((currentloggedInUser=='true' && mode=='' && validateIfPTDueExists=='') ||(currentloggedInUser=='true' && validateIfPTDueExists=='false'))
-		{
-		$(".show-row").hide(); 
-		$('#approvalDepartment').removeAttr('required');
-		$('#approvalDesignation').removeAttr('required');
-		$('#approvalPosition').removeAttr('required');
-		}
 
-	var documentName = $('#documentName').val();
-	var other ="Other"
-	
-	$('#cardHolderDiv').hide();
-	$('#bplCardHolderName').removeAttr('required');
-	
-	changecategory();
-	
 	$('#propertyIdentifier').blur(function(){
-		validatePrimaryConnection();		
+		validateSewerageConnection();
 	});
 	
-	function changecategory(){
-		if ($('#connectionCategorie :selected').text().localeCompare("BPL") == 0 ) {  
-			$("#cardHolderDiv").show();
-	    	$("#bplCardHolderName").attr('required', 'required');
-	    	$("#bplCardHolderName").val();
-			/*$(".check-text:contains('"+documentName+"')").parent().find('input, textarea, button, select').attr("required","required");
-			$(".check-text:contains('"+documentName+"')").parent().find('input:checkbox').prop('checked', true);
-			$(".check-text:contains('"+documentName+"')").parent().find('input[type=hidden]:eq(1)').val(true);*/
-		}
-		else if($('#connectionCategorie :selected').text().localeCompare("BPL") != -1)  {
-			$("#cardHolderDiv").hide();
-	    	$("#bplCardHolderName").removeAttr('required');
-	    	$("#bplCardHolderName").val('');
-	    	/*$(".check-text:contains('"+documentName+"')").parent().find('input, textarea, button, select').removeAttr('required');
-	     	$(".check-text:contains('"+other+"')").parent().find('input, textarea, button, select').removeAttr('required');
-	     	$(".check-text:contains('"+documentName+"')").parent().find('input:checkbox').prop('checked', false);
-	     	$(".check-text:contains('"+documentName+"')").parent().find('input[type=hidden]:eq(1)').val(false);*/
-		}
-	}
-	
-	function validatePrimaryConnection() {
+	function validateSewerageConnection() {
 		propertyID=$('#propertyIdentifier').val()
 		if(propertyID != '') {
 			$.ajax({
-				url: "/stms/ajaxconnection/check-primaryconnection-exists",      
+				url: "/stms/ajaxconnection/check-connection-exists",      
 				type: "GET",
 				data: {
 					propertyID : propertyID  
 				},
 				dataType: "json",
 				success: function (response) { 
-					console.log("success"+response);
 					if(response != '') {
 						
 						if($('#legacy'))
@@ -110,7 +71,6 @@ $(document).ready(function(){
 								resetPropertyDetails();
 								bootbox.alert(response);
 							}
-
 						}
 						else
 						{	
@@ -123,9 +83,8 @@ $(document).ready(function(){
 					}
 				}, 
 				error: function (response) {
-					console.log("failed");
 					resetPropertyDetails();
-					bootbox.alert("Primary connection validation failed");
+					bootbox.alert("connection validation failed");
 				}
 			});
 		}		
@@ -142,7 +101,6 @@ function loadPropertyDetails() {
 			type: "GET",
 			dataType: "json",
 			success: function (response) { 
-				console.log("success"+response);
 				var waterTaxDue = getWaterTaxDue(propertyID);
 				if(response.errorDetails.errorCode != null && response.errorDetails.errorCode != '') {
 					if($('#legacy'))
@@ -159,7 +117,7 @@ function loadPropertyDetails() {
 					else if(waterTaxDue > 0) {
 						errorMessage += "Water tax is due with Rs. "+waterTaxDue+"/- for the assessment no "+propertyID+", please pay the due amount to create new Sewerage connection";
 					}
-					else if((allowIfPTDueExists=='false' && response.propertyDetails.taxDue > 0) || waterTaxDue > 0) {
+					if((allowIfPTDueExists=='false' && response.propertyDetails.taxDue > 0) || waterTaxDue > 0) {
 						bootbox.alert(errorMessage);
 					}
 					else {					

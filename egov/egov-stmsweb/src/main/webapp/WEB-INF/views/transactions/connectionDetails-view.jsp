@@ -132,7 +132,7 @@
 							<c:when test="${not empty sewerageApplicationDetails.donationCharges}">
 								<c:out value="${sewerageApplicationDetails.donationCharges}" />
 							</c:when>
-							<c:otherwise>-</c:otherwise>
+							<c:otherwise>0.0</c:otherwise>
 						</c:choose>
 					</div>
 					<div class="col-xs-3 add-margin"><spring:message code="lbl.estimationcharges"/></div>
@@ -141,11 +141,19 @@
 						<c:when test="${not empty sewerageApplicationDetails.fieldInspectionDetails.estimationCharges}">
 							<c:out value="${sewerageApplicationDetails.fieldInspectionDetails.estimationCharges}" />
 						</c:when>
-						<c:otherwise>-</c:otherwise>
+						<c:otherwise>0.0</c:otherwise>
 					</c:choose>
 					</div>
 				</div>
 			</div>
+			<c:if test="${sewerageApplicationDetails.fileStore != null}">
+				<div class="panel-footer"><spring:message
+					code="lbl.fileattached" /></div>
+				<div>
+					<a href="/stms/transactions/downloadFile?applicationNumber=${sewerageApplicationDetails.applicationNumber }">${sewerageApplicationDetails.fileStore.fileName }</a>
+				</div>
+			</c:if>
 		</div>
 		</div>
 	</div>
+	<%-- <jsp:include page="documentdetails-view.jsp"></jsp:include> --%>

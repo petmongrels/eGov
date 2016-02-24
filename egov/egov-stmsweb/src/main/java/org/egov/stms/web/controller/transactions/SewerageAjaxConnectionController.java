@@ -16,18 +16,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class SewerageAjaxConnectionController {
-    
+
     @Autowired
     private SewerageApplicationDetailsService sewerageApplicationDetailsService;
-    
+
     @Autowired
     private PropertyService propertyservice;
-    
-    @RequestMapping(value = "/ajaxconnection/check-primaryconnection-exists", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+
+    @RequestMapping(value = "/ajaxconnection/check-connection-exists", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String isConnectionPresentForProperty(@RequestParam final String propertyID) {
         return sewerageApplicationDetailsService.checkConnectionPresentForProperty(propertyID);
     }
-    
+
     @RequestMapping(value = "/ajaxconnection/check-watertax-due", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody BigDecimal getWaterTaxDue(@RequestParam("assessmentNo") String assessmentNo, HttpServletRequest request) {
         BigDecimal waterTaxDue = propertyservice.getWaterTaxDues(assessmentNo, request);

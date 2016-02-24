@@ -67,8 +67,8 @@
         <put-attribute name="page-title" value="title.newconnection" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/transactions/application-success.jsp"/>
     </definition>
-	<definition name="newSewerageConnection-ack" extends="base_layout">
-        <put-attribute name="page-title" value="title.ack" cascade="true"/>
-        <put-attribute name="body" value="/WEB-INF/views/transactions/newSewerageConnection-ack.jsp"/>
+    <definition name="newconnection-edit" extends="base_layout">
+        <put-attribute name="page-title" value="title.viewapplication" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/newConnection-edit.jsp"/> 
     </definition>
 </tiles-definitions>
