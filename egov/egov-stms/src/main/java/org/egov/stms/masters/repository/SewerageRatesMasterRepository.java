@@ -39,8 +39,8 @@
  */
 package org.egov.stms.masters.repository;
 
+import java.util.Date;
 import java.util.List;
-
 import org.egov.stms.masters.entity.SewerageRatesMaster;
 import org.egov.stms.masters.entity.enums.PropertyType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -50,4 +50,10 @@ import org.springframework.stereotype.Repository;
 public interface SewerageRatesMasterRepository extends JpaRepository<SewerageRatesMaster, Long> {
 
     List<SewerageRatesMaster> findAllByPropertyType(PropertyType propertyType);
+
+    SewerageRatesMaster findByPropertyTypeAndFromDateAndActive(PropertyType propertyType,
+            Date fromDate, boolean active);
+
+    SewerageRatesMaster findByPropertyTypeAndActive(PropertyType propertyType,
+            boolean active);
 }

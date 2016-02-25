@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+/*#-------------------------------------------------------------------------------
 # eGov suite of products aim to improve the internal efficiency,transparency, 
 #    accountability and the service delivery of the government  organizations.
 # 
@@ -36,14 +36,7 @@
 # 	   or trademarks of eGovernments Foundation.
 # 
 #   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
-#-------------------------------------------------------------------------------
-msg.newconnection.ack.success=Application for new sewerage connection received 
-msg.sussess.forward=and Application successfully forwarded to 
-msg.sign=Signature
-msg.connection.process.success=Application for new sewerage connection completed successfully
-msg.connection.rejected=Application for new sewerage connection has been rejected
-msg.new.sewerage.conn=New Sewerage Connection
-msg.newconnection.creation.success=Application for new sewearge connection received successfully
-msg.sign=Signature
-msg.seweragemonthlyrate.creation.success=Sewerage rate master created successfully.
-msg.donationrate.creation.success=Donation master created successfully.
+#-------------------------------------------------------------------------------*/
+$(document).ready(function() {
+	$('#propertyType').text($('#propertyType').text().replace(/_/g, ' '))
+});
