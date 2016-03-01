@@ -58,6 +58,7 @@ import org.egov.infra.admin.master.service.BoundaryService;
 import org.egov.infra.admin.master.service.CityService;
 import org.egov.infra.admin.master.service.DepartmentService;
 import org.egov.infra.admin.master.service.UserService;
+import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.utils.EgovThreadLocals;
 import org.egov.infra.workflow.entity.State;
 import org.egov.infra.workflow.entity.StateHistory;
@@ -72,6 +73,7 @@ import org.egov.stms.utils.constants.SewerageTaxConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 @Service
 public class SewerageTaxUtils {
@@ -107,6 +109,9 @@ public class SewerageTaxUtils {
 
     @Autowired
     private CityService cityService;
+    
+    @Autowired
+    private SecurityUtils securityUtils;
 
     public Boolean isNewConnectionAllowedIfPTDuePresent() {
         AppConfigValues appConfigValue = null;
@@ -332,5 +337,38 @@ public class SewerageTaxUtils {
 
     public String getCityCode() {
         return cityService.getCityByURL(EgovThreadLocals.getDomainName()).getCode();
+    }
+    
+    //allowing only for CollectionOperator to collect Fees
+    @ModelAttribute(value = "checkOperator")
+    public Boolean checkCollectionOperatorRole() {
+        Boolean isCSCOperator = false;
+        // as per Adoni allowing collection for ULB Operator
+        if (EgovThreadLocals.getUserId() != null) {
+            final User userObj = userService.getUserById(EgovThreadLocals.getUserId());
+            if (userObj != null)
+                for (final Role role : userObj.getRoles())
+                    if (role != null && (role.getName().contains(SewerageTaxConstants.ROLE_BILLCOLLECTOR) )) {
+                        isCSCOperator = true;
+                        break;
+                    }
+        }
+        return isCSCOperator;
+    }
+    
+    public Boolean getCitizenUserRole() {
+        Boolean citizenrole = Boolean.FALSE;
+        if (EgovThreadLocals.getUserId() != null) {
+            final User currentUser = userService.getUserById(EgovThreadLocals.getUserId());
+            if (currentUser.getRoles().isEmpty() && securityUtils.getCurrentUser().getUsername().equals("anonymous"))
+                citizenrole = Boolean.TRUE;
+            for (final Role userrole : currentUser.getRoles())
+                if (userrole != null && userrole.getName().equals(SewerageTaxConstants.ROLE_CITIZEN)) {
+                    citizenrole = Boolean.TRUE;
+                    break;
+                }
+        } else
+            citizenrole = Boolean.TRUE;
+        return citizenrole;
     }
 }

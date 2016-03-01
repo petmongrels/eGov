@@ -43,23 +43,33 @@
 		<put-attribute name="body" value="/WEB-INF/views/error/{1}.jsp" />
 	</definition>
 	<definition name="newconnection-form" extends="base_layout">
-        <put-attribute name="page-title" value="title.newconnection" cascade="true"/>
-        <put-attribute name="body" value="/WEB-INF/views/transactions/newConnection-form.jsp"/>
-    </definition>
-    <definition name="application-success" extends="base_layout">
-        <put-attribute name="page-title" value="title.newconnection" cascade="true"/>
-        <put-attribute name="body" value="/WEB-INF/views/transactions/application-success.jsp"/>
-    </definition>
-    <definition name="newconnection-edit" extends="base_layout">
-        <put-attribute name="page-title" value="title.viewapplication" cascade="true"/>
-        <put-attribute name="body" value="/WEB-INF/views/transactions/newConnection-edit.jsp"/> 
-    </definition>
+		<put-attribute name="page-title" value="title.newconnection"
+			cascade="true" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/transactions/newConnection-form.jsp" />
+	</definition>
+	<definition name="application-success" extends="base_layout">
+		<put-attribute name="page-title" value="title.newconnection"
+			cascade="true" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/transactions/application-success.jsp" />
+	</definition>
+	<definition name="newconnection-edit" extends="base_layout">
+		<put-attribute name="page-title" value="title.viewapplication"
+			cascade="true" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/transactions/newConnection-edit.jsp" />
+	</definition>
 	<definition name="newSewerageConnection-ack" extends="base_layout">
 		<put-attribute name="page-title" value="title.ack"
 			cascade="true" />
 		<put-attribute name="body"
 			value="/WEB-INF/views/transactions/newSewerageConnection-ack.jsp" />
 	</definition>
+	<definition name="application-view" extends="base_layout">	 
+        <put-attribute name="page-title" value="title.viewapplication" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/application-view.jsp"/>
+    </definition>
 	<definition name="sewerageRates-master" extends="base_layout">
 		<put-attribute name="page-title" value="title.sewerage.rates"
 			cascade="true" />
@@ -73,15 +83,15 @@
 			value="/WEB-INF/views/masters/sewerageRates-success.jsp" />
 	</definition>
 	<definition name="donation-master" extends="base_layout">
-	<put-attribute name="page-title" value="title.donation.master"
-		cascade="true" />
-	<put-attribute name="body"
-		value="/WEB-INF/views/masters/donation-master.jsp" />
-</definition>
-<definition name="donation-master-success" extends="base_layout">
-	<put-attribute name="page-title" value="title.donation.master"
-		cascade="true" />
-	<put-attribute name="body"
-		value="/WEB-INF/views/masters/donation-master-success.jsp" />
-</definition>
+		<put-attribute name="page-title" value="title.donation.master"
+			cascade="true" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/masters/donation-master.jsp" />
+	</definition>
+	<definition name="donation-master-success" extends="base_layout">
+		<put-attribute name="page-title" value="title.donation.master"
+			cascade="true" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/masters/donation-master-success.jsp" />
+	</definition>
 </tiles-definitions>

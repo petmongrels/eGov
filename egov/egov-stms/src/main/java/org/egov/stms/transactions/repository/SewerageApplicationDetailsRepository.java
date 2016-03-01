@@ -77,4 +77,5 @@ public interface SewerageApplicationDetailsRepository extends JpaRepository<Sewe
     SewerageApplicationDetails getSewerageConnectionDetailsByPropertyID(
             @Param("propertyIdentifier") String propertyIdentifier);
 
+    SewerageApplicationDetails findByApplicationNumberOrConnection_DhscNumber(String applicationNumber, String dhscNumber);
 }

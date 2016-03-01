@@ -38,6 +38,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -51,6 +52,8 @@ import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.admin.master.service.UserService;
 import org.egov.infra.reporting.engine.ReportOutput;
 import org.egov.infra.search.elastic.entity.ApplicationIndex;
+import org.egov.infra.search.elastic.entity.ApplicationIndexBuilder;
+import org.egov.infra.search.elastic.entity.enums.ApprovalStatus;
 import org.egov.infra.search.elastic.service.ApplicationIndexService;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.utils.ApplicationNumberGenerator;
@@ -66,7 +69,6 @@ import org.egov.stms.masters.entity.SewerageApplicationType;
 import org.egov.stms.masters.entity.enums.SewerageConnectionStatus;
 import org.egov.stms.masters.repository.SewerageApplicationTypeRepository;
 import org.egov.stms.transactions.entity.SewerageApplicationDetails;
-import org.egov.stms.transactions.entity.SewerageConnection;
 import org.egov.stms.transactions.repository.SewerageApplicationDetailsRepository;
 import org.egov.stms.transactions.workflow.ApplicationWorkflowCustomDefaultImpl;
 import org.egov.stms.utils.SewerageTaxNumberGenerator;
@@ -78,10 +80,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -144,6 +142,14 @@ public class SewerageApplicationDetailsService {
     public SewerageApplicationDetails findByApplicationNumber(final String applicationNumber) {
         return sewerageApplicationDetailsRepository.findByApplicationNumber(applicationNumber);
     }
+    
+    public SewerageApplicationDetails findByApplicationNumberAndConnectionStatus(final String applicationNumber, final SewerageConnectionStatus status) {
+        return sewerageApplicationDetailsRepository.findByApplicationNumberAndConnection_ConnectionStatus(applicationNumber, status);
+    }
+    
+    public SewerageApplicationDetails findByApplicationNumberOrConnection_DhscNumber(String applicationNumber) {
+        return sewerageApplicationDetailsRepository.findByApplicationNumberOrConnection_DhscNumber(applicationNumber, applicationNumber);
+    }
 
     @Transactional
     public SewerageApplicationDetails createNewSewerageConnection(final SewerageApplicationDetails sewerageApplicationDetails,
@@ -167,6 +173,8 @@ public class SewerageApplicationDetailsService {
 
         applicationWorkflowCustomDefaultImpl.createCommonWorkflowTransition(savedSewerageApplicationDetails,
                 approvalPosition, approvalComent, additionalRule, workFlowAction);
+        
+        updateIndexes(savedSewerageApplicationDetails);
 
         return savedSewerageApplicationDetails;
     }
@@ -274,6 +282,7 @@ public class SewerageApplicationDetailsService {
         final StringBuilder mobileNumber = new StringBuilder();
         Assignment assignment = null;
         User user = null;
+        Integer elapsedDays = 0;
         final StringBuilder aadharNumber = new StringBuilder();
         if (null != ownerNameItr && ownerNameItr.hasNext()) {
             final OwnerName primaryOwner = ownerNameItr.next();
@@ -304,7 +313,7 @@ public class SewerageApplicationDetailsService {
                 user = userService.getUserById(asignList.get(0).getEmployee().getId());
         } else
             user = securityUtils.getCurrentUser();
-        final ApplicationIndex applicationIndex = applicationIndexService
+        ApplicationIndex applicationIndex = applicationIndexService
                 .findByApplicationNumber(sewerageApplicationDetails.getApplicationNumber());
         if (applicationIndex != null && null != sewerageApplicationDetails.getId()
                 && sewerageApplicationDetails.getStatus() != null
@@ -323,20 +332,68 @@ public class SewerageApplicationDetailsService {
                             || sewerageApplicationDetails.getStatus().getCode()
                                     .equals(SewerageTaxConstants.APPLICATION_STATUS_WOGENERATED)
                             || sewerageApplicationDetails.getStatus().getCode()
-                            .equals(SewerageTaxConstants.APPLICATION_STATUS_SANCTIONED))) {
+                            .equals(SewerageTaxConstants.APPLICATION_STATUS_SANCTIONED))
+                            || sewerageApplicationDetails.getStatus().getCode()
+                            .equals(SewerageTaxConstants.APPLICATION_STATUS_CHECKED)) {
                 applicationIndex.setStatus(sewerageApplicationDetails.getStatus().getDescription());
                 applicationIndex.setApplicantAddress(assessmentDetails.getPropertyAddress());
                 applicationIndex.setOwnername(user.getUsername() + "::" + user.getName());
                 if (sewerageApplicationDetails.getConnection().getDhscNumber() != null)
                     applicationIndex.setConsumerCode(sewerageApplicationDetails.getConnection().getDhscNumber());
+                if(sewerageApplicationDetails.getStatus().getCode()
+                            .equals(SewerageTaxConstants.APPLICATION_STATUS_APPROVED) || sewerageApplicationDetails.getStatus().getCode()
+                            .equals(SewerageTaxConstants.APPLICATION_STATUS_WOGENERATED))
+                    applicationIndex.setApproved(ApprovalStatus.APPROVED);
+                else if(sewerageApplicationDetails.getStatus().getCode()
+                        .equals(SewerageTaxConstants.APPLICATION_STATUS_CANCELLED)) {
+                    elapsedDays = (int) TimeUnit.DAYS.convert(new Date().getTime() - sewerageApplicationDetails.getApplicationDate().getTime(), TimeUnit.MILLISECONDS);
+                    applicationIndex.setElapsedDays(elapsedDays);
+                    applicationIndex.setApproved(ApprovalStatus.REJECTED);
+                }
+                else if(sewerageApplicationDetails.getStatus().getCode()
+                        .equals(SewerageTaxConstants.APPLICATION_STATUS_SANCTIONED)) {
+                    elapsedDays = (int) TimeUnit.DAYS.convert(new Date().getTime() - sewerageApplicationDetails.getApplicationDate().getTime(), TimeUnit.MILLISECONDS);
+                    applicationIndex.setElapsedDays(elapsedDays);
+                }
+                else
+                    applicationIndex.setApproved(ApprovalStatus.UNKNOWN);
                 applicationIndexService.updateApplicationIndex(applicationIndex);
             }
-        }
+            
+         // making connection active only on Sanction
+            if (sewerageApplicationDetails.getStatus().getCode().equals(SewerageTaxConstants.APPLICATION_STATUS_SANCTIONED))
+                if (sewerageApplicationDetails.getConnection().getConnectionStatus().equals(SewerageConnectionStatus.INPROGRESS))
+                    sewerageApplicationDetails.getConnection().setConnectionStatus(SewerageConnectionStatus.ACTIVE);
+        } else {
 
-        // Creating Consumer Index only on Sanction
-        if (sewerageApplicationDetails.getStatus().getCode().equals(SewerageTaxConstants.APPLICATION_STATUS_SANCTIONED))
-            if (sewerageApplicationDetails.getConnection().getConnectionStatus().equals(SewerageConnectionStatus.INPROGRESS))
-                sewerageApplicationDetails.getConnection().setConnectionStatus(SewerageConnectionStatus.ACTIVE);
+            if (sewerageApplicationDetails.getApplicationDate() == null)
+                sewerageApplicationDetails.setApplicationDate(new Date());
+            if (applicationIndex == null) {
+                if (LOG.isDebugEnabled())
+                    LOG.debug("Application Index creation Started... ");
+                final ApplicationIndexBuilder applicationIndexBuilder = new ApplicationIndexBuilder(
+                        SewerageTaxConstants.APPL_INDEX_MODULE_NAME, sewerageApplicationDetails.getApplicationNumber(),
+                        sewerageApplicationDetails.getApplicationDate(), sewerageApplicationDetails.getApplicationType().getName(),
+                        consumerName.toString(), sewerageApplicationDetails.getStatus().getDescription().toString(),
+                        "/stms/application/view/" + sewerageApplicationDetails.getApplicationNumber(),
+                        assessmentDetails.getPropertyAddress(), user.getUsername() + "::" + user.getName());
+
+                if (sewerageApplicationDetails.getDisposalDate() != null)
+                    applicationIndexBuilder.disposalDate(sewerageApplicationDetails.getDisposalDate());
+                applicationIndexBuilder.mobileNumber(mobileNumber.toString());
+                applicationIndexBuilder.aadharNumber(aadharNumber.toString());
+
+                applicationIndex = applicationIndexBuilder.build();
+                if(!sewerageApplicationDetails.getStatus().getCode()
+                        .equals(SewerageTaxConstants.APPLICATION_STATUS_SANCTIONED)) {
+                    applicationIndex.setApproved(ApprovalStatus.UNKNOWN);
+                    applicationIndexService.createApplicationIndex(applicationIndex);
+                }    
+            }
+            if (LOG.isDebugEnabled())
+                LOG.debug("Application Index creation completed...");
+        
+        }
     }
 
     public BigDecimal getTotalAmount(final SewerageApplicationDetails sewerageApplicationDetails) {

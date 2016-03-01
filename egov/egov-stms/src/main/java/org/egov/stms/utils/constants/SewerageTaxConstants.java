@@ -43,6 +43,7 @@ public class SewerageTaxConstants {
 
     public static final String FILESTORE_MODULECODE = "STMS";
     public static final String MODULE_NAME = "Sewerage Tax Management";
+    public static final String APPL_INDEX_MODULE_NAME = "Sewerage Tax";
     public static final String APPLICATION_NUMBER = "applicationNumber";
     public static final String NEWSEWERAGECONNECTION = "NEWSEWERAGECONNECTION";
     public static final String MODULETYPE = "SEWERAGETAXAPPLICATION";
@@ -82,6 +83,10 @@ public class SewerageTaxConstants {
     public static final String ROLE_SUPERUSER = "Super User";
     public static final String ROLE_EXECUTIVEDEPARTEMNT = "Engineering";
     public static final String ROLE_DEPUTYDEPARTEMNT = "Engineering";
+    public static final String ROLE_CSCOPERTAOR = "CSC Operator";
+    public static final String ROLE_ULBOPERATOR = "ULB Operator";
+    public static final String ROLE_BILLCOLLECTOR = "Collection Operator";
+    public static final String ROLE_CITIZEN = "Citizen";
 
     public static final String MODE = "mode";
     public static final String APPROVAL_POSITION = "approvalPosition";
