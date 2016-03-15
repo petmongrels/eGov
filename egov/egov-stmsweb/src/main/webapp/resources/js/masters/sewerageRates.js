@@ -38,7 +38,7 @@
 #   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
 #-------------------------------------------------------------------------------*/
 $(document).ready(function() {
-					$("#fromDate").change(validateEffectiveDate);        // validate effective date
+
 					$("#submitform").click(function() {
 						if ($("#sewerageRatesMasterform").valid())
 							 if(!validateEffectiveDate())
@@ -88,7 +88,7 @@ $(document).ready(function() {
 
 					$('#propertyType option').each(function() {     // remove  propety type mixed option and underscore
 						var $this = $(this);
-						$this.text($this.text().replace(/_/g, ' '));
+						$this.text($this.text().replace(/_/g,' '));
 						if ($this.text() == "MIXED")
 							$(this).remove();
 					});
@@ -105,7 +105,9 @@ $(document).ready(function() {
 						}
 					}
 					
-					function getTodayDate() {                           // validate effective date
+					function getTodayDate() {                                    // validate effective date
+						if(!validateAmmount())
+						return false;
 						var date;
 						var d = new Date();
 						var curr_date = d.getDate();
@@ -123,14 +125,14 @@ $(document).ready(function() {
 						ret = (eval(dt2[2]) > eval(dt1[2])) ? 1
 								: (eval(dt2[2]) < eval(dt1[2])) ? -1
 										: (eval(dt2[1]) > eval(dt1[1])) ? 1
-												: (eval(dt2[1]) < eval(dt1[1])) ? -1															// decimal points
+												: (eval(dt2[1]) < eval(dt1[1])) ? -1						// decimal points
 														: (eval(dt2[0]) > eval(dt1[0])) ? 1
 																: (eval(dt2[0]) < eval(dt1[0])) ? -1
 																		: 0;
 						return ret;
 					}
 					
-					$('#monthlyRate').keyup(function(e) {                       // validate two decimal points
+					$('#monthlyRate').keyup(function(e) {    // validate two decimal points
 						var regex = /^\d+(\.\d{0,2})?$/g;
 						if (!regex.test(this.value)) {
 							$(this).val($(this).getNum());
@@ -148,5 +150,18 @@ $(document).ready(function() {
 							num = '';
 						}
 						return num;
+						
 					}
+					
+					function validateAmmount(){
+						var val =  $('#monthlyRate').val();
+						if(val<1){
+							bootbox.alert($("#err-validate-amount").text());
+							return false;
+						}else
+							return true;
+				    }
+					$( "#view" ).click(function() {
+						  window.location = "/stms/seweragerates/view";
+						});
 				});

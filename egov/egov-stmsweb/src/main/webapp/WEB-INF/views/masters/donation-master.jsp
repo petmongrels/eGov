@@ -1,3 +1,4 @@
+
 <!--
 	eGov suite of products aim to improve the internal efficiency,transparency, 
     accountability and the service delivery of the government  organizations.
@@ -41,29 +42,27 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-
 <form:form method="post" action=""
 	class="form-horizontal form-groups-bordered"
-	modelAttribute="sewerageRatesMaster" id="sewerageRatesMasterform"
-	cssClass="form-horizontal form-groups-bordered"
-	enctype="multipart/form-data">
+	modelAttribute="donationMaster" id="donationMaster"
+	cssClass="form-horizontal form-groups-bordered">
 	<div class="panel panel-primary" data-collapsed="0">
 		<span id="err-validate-effective-date" style="display: none"> <spring:message
 				code='err.validate.effective.date' />
-		</span> <span id="err-validate-overwritevalidate" style="display: none">
-			<spring:message code='err.validate.overwrite.validate' />
-		</span>
-		 <span id="err-validate-amount" style="display: none"> <spring:message
-				code='err.validate.monthlyrate' />
+		</span> 
+		<span id="err-validate-donationoverwritevalidate"
+			style="display: none"> <spring:message
+				code='err.validate.donationoverwrite.validate' />
+		</span> <span id="err-validate-amount" style="display: none"> <spring:message
+				code='err.validate.amount' />
 		</span>
 		<div class="panel-heading"></div>
-		<div class="panel-body custom-form">
+		<div class="psanel-body custom-form">
 			<div class="form-group">
 				<label class="col-sm-3 control-label text-right"> <spring:message
 						code="lbl.propertytype" /> <span class="mandatory"></span>
 				</label>
 				<div class="col-sm-3 add-margin">
-
 					<form:select path="propertyType" data-first-option="false"
 						id="propertyType" cssClass="form-control" required="required">
 						<form:option value="">
@@ -74,21 +73,37 @@
 					<form:errors path="propertyType" cssClass="add-margin error-msg" />
 				</div>
 			</div>
-
 			<div class="form-group">
 				<label class="col-sm-3 control-label text-right"><spring:message
-						code="lbl.monthlyrate"></spring:message> <span class="mandatory"></span></label>
+						code="lbl.noofclosets" /><span class="mandatory"></span></label>
 				<div class="col-sm-3 add-margin">
-					<input type="text" class="form-control patternvalidation"
-						data-pattern="decimalvalue" maxlength="8" name="monthlyRate"
-						id="monthlyRate" style="text-align: right" required="required" />
+					<form:select path="noOfClosets" id="noOfClosets"
+						cssClass="form-control" required="required">
+						<form:option value="">
+							<spring:message code="lbl.select" />
+						</form:option>
+						<c:forEach var="i" begin="1" end="50">
+							<form:option value="${i}" />
+						</c:forEach>
+					</form:select>
 				</div>
 				<label class="col-sm-2 control-label text-right"><spring:message
+						code="lbl.donation.amount" /><span class="mandatory"></span></label>
+				<div class="col-sm-3 add-margin">
+					<form:input class="form-control patternvalidation"
+						data-pattern="decimalValue" maxlength="8" id="amount" value=""
+						path="amount" style="text-align: right" required="required" />
+					<form:errors path="amount" cssClass="add-margin error-msg" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label text-right"><spring:message
 						code="lbl.effective.fromdate" /><span class="mandatory"></span></label>
 				<div class="col-sm-3 add-margin">
-					<input type="text" name="fromDate" id="fromDate"
-						class="form-control datepicker" data-inputmask="'mask': 'd/m/y'"
-						required="required">
+					<form:input path="fromDate" class="form-control datepicker"
+						id="effectiveDate" data-inputmask="'mask': 'd/m/y'"
+						required="required" />
+					<form:errors path="fromDate" cssClass="add-margin error-msg" />
 				</div>
 			</div>
 		</div>
@@ -104,11 +119,11 @@
 				href="javascript:void(0)"><spring:message code="lbl.close" /></a>
 		</div>
 	</div>
-
 </form:form>
 
 <script
 	src="<c:url value='/resources/global/js/jquery/plugins/datatables/dataTables.bootstrap.js' context='/egi'/>"
 	type="text/javascript"></script>
+
 <script
-	src="<c:url value='/resources/js/masters/sewerageRates.js?rnd=${app_release_no}'/>"></script>
+	src="<c:url value='/resources/js/masters/donationMaster.js?rnd=${app_release_no}'/>"></script>

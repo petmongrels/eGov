@@ -39,12 +39,13 @@
  */
 package org.egov.stms.masters.service;
 
+import java.util.Date;
 import java.util.List;
-
 import org.egov.stms.masters.entity.DonationMaster;
 import org.egov.stms.masters.entity.enums.PropertyType;
 import org.egov.stms.masters.repository.DonationMasterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,20 +65,20 @@ public class DonationMasterService {
     }
 
     @Transactional
-    public DonationMaster createDonationHeader(final DonationMaster donationMaster) {
+    public DonationMaster create(final DonationMaster donationMaster) {
         return donationMasterRepository.save(donationMaster);
     }
 
     @Transactional
-    public void updateDonationHeader(final DonationMaster donationMaster) {
+    public void update(final DonationMaster donationMaster) {
         donationMasterRepository.save(donationMaster);
     }
 
     public List<DonationMaster> findAll() {
-        return donationMasterRepository.findAll();
+        return donationMasterRepository.findAll(new Sort(Sort.Direction.DESC, "propertyType","noOfClosets" ,"fromDate"));
     }
 
-    public List<DonationMaster> findAllByCategory(final PropertyType propertyType) {
+    public List<DonationMaster> findAllByPropertyType(final PropertyType propertyType) {
         return donationMasterRepository.findAllByPropertyType(propertyType);
     }
 
@@ -85,4 +86,13 @@ public class DonationMasterService {
         return donationMasterRepository.getOne(id);
     }
 
+    public DonationMaster findByPropertyTypeAndNoOfClosetsAndFromDateAndActive(final PropertyType propertyType,final Integer noOfClosets,
+            final Date fromDate, final boolean active) {
+        return donationMasterRepository.findByPropertyTypeAndNoOfClosetsAndFromDateAndActive(propertyType,noOfClosets, fromDate, active);
+    }
+
+    public DonationMaster findByPropertyTypeAndNoOfClosetsAndActive(final PropertyType propertyType,
+            final Integer noOfClosets,final boolean active) {
+        return donationMasterRepository.findByPropertyTypeAndNoOfClosetsAndActive(propertyType, noOfClosets,active);
+    }
 }

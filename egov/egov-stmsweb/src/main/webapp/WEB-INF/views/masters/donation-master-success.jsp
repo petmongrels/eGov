@@ -41,10 +41,9 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-
 <form:form method="get" action=""
 	class="form-horizontal form-groups-bordered"
-	modelAttribute="sewerageRatesMaster" id="sewerageRatesMasterform">
+	modelAttribute="donationMaster" id="donationMasterform">
 	<div class="row">
 		<div class="col-md-12">
 			<c:if test="${not empty message}">
@@ -63,7 +62,7 @@
 						</div>
 						<div id="propertyType"
 							class="col-md-3 col-xs-6 add-margin view-content">
-							<c:out value="${sewerageRatesMaster.propertyType}" />
+							<c:out value="${donationMaster.propertyType}" />
 						</div>
 					</div>
 				</div>
@@ -71,30 +70,39 @@
 					<div class="row add-border">
 
 						<div class="col-md-3 col-xs-6 add-margin">
-							<spring:message code="lbl.monthlyrate" />
+							<spring:message code="lbl.donation.amount" />
 						</div>
 						<div class="col-md-3 col-xs-6 add-margin view-content">
-							<fmt:formatNumber type="number" minFractionDigits="2"
-								maxFractionDigits="2" value="${sewerageRatesMaster.monthlyRate}" />
-						</div>
+							<fmt:formatNumber type="number" 
+            minFractionDigits="2" maxFractionDigits="2" value="${donationMaster.amount}" />
 						</div>
 					</div>
+				</div>
 				<div class="panel-body">
 					<div class="row add-border">
 
+						<div class="col-md-3 col-xs-6 add-margin">
+							<spring:message code="lbl.noofclosets" />
+						</div>
+						<div class="col-md-3 col-xs-6 add-margin view-content">
+							<c:out value="${donationMaster.noOfClosets}" />
+						</div>
+					</div>
+				</div>
+				<div class="panel-body">
+					<div class="row add-border">
 						<div class="col-md-3 col-xs-6 add-margin">
 							<spring:message code="lbl.effective.fromdate" />
 						</div>
 						<div class="col-md-3 col-xs-6 add-margin view-content">
 							<fmt:formatDate pattern="dd/MM/yyyy"
-								value="${sewerageRatesMaster.fromDate}" />
+								value="${donationMaster.fromDate}" />
 						</div>
 					</div>
 				</div>
-				</div>
 			</div>
 		</div>
-	
+	</div>
 	<div class="row text-center">
 		<div class="row">
 			<a href="javascript:void(0)" class="btn btn-default"
@@ -102,5 +110,8 @@
 		</div>
 	</div>
 </form:form>
-<script
-	src="<c:url value='/resources/js/masters/sewerageRatesSuccess.js?rnd=${app_release_no}'/>"></script>
+<script>
+	$(document).ready(function() {
+		$('#propertyType').text($('#propertyType').text().replace(/_/g, ' '))
+	});
+</script>

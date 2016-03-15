@@ -39,6 +39,7 @@
  */
 package org.egov.stms.masters.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.egov.stms.masters.entity.DonationMaster;
@@ -50,5 +51,10 @@ import org.springframework.stereotype.Repository;
 public interface DonationMasterRepository extends JpaRepository<DonationMaster, Long> {
 
     List<DonationMaster> findAllByPropertyType(PropertyType propertyType);
+    
+    DonationMaster findByPropertyTypeAndNoOfClosetsAndFromDateAndActive(PropertyType propertyType,Integer noOfClosets,
+            Date fromDate, boolean active);
 
-}
+    DonationMaster findByPropertyTypeAndNoOfClosetsAndActive(PropertyType propertyType,
+            Integer noOfClosets,boolean active);
+ }

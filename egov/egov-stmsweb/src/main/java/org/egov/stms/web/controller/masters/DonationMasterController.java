@@ -39,9 +39,10 @@
 package org.egov.stms.web.controller.masters;
 
 import javax.validation.Valid;
-import org.egov.stms.masters.entity.SewerageRatesMaster;
+
+import org.egov.stms.masters.entity.DonationMaster;
 import org.egov.stms.masters.entity.enums.PropertyType;
-import org.egov.stms.masters.service.SewerageRatesMasterService;
+import org.egov.stms.masters.service.DonationMasterService;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -55,72 +56,67 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping(value = "/masters")
-public class SewerageRateMasterController {
+public class DonationMasterController {
 
-    private final SewerageRatesMasterService sewerageRatesMasterService;
+    private final DonationMasterService donationMasterService;
 
     @Autowired
-    public SewerageRateMasterController(final SewerageRatesMasterService sewerageRatesMasterService) {
-        this.sewerageRatesMasterService = sewerageRatesMasterService;
+    public DonationMasterController(final DonationMasterService donationMasterService) {
+        this.donationMasterService = donationMasterService;
     }
 
-    @RequestMapping(value = "/seweragerates", method = RequestMethod.GET)
+    @RequestMapping(value = "/donationmaster", method = RequestMethod.GET)
     public String showForm(
-            @ModelAttribute SewerageRatesMaster sewerageRatesMaster,
+            @ModelAttribute DonationMaster donationMaster,
             final Model model) {
-        sewerageRatesMaster = new SewerageRatesMaster();
+        donationMaster = new DonationMaster();
+        model.addAttribute("donationmaster", donationMaster);
         model.addAttribute("propertyTypes", PropertyType.values());
-
-        return "sewerageRates-master";
+        return "donation-master";
     }
 
-    @RequestMapping(value = "/seweragerates", method = RequestMethod.POST)
-    public String create(
-            @Valid @ModelAttribute final SewerageRatesMaster sewerageRatesMaster,
+    @RequestMapping(value = "/donationmaster ", method = RequestMethod.POST)
+    public String create(@Valid @ModelAttribute final DonationMaster donationMaster,
             final RedirectAttributes redirectAttrs, final Model model,
             final BindingResult resultBinder) {
-
         if (resultBinder.hasErrors()) {
+            model.addAttribute("donationmaster", donationMaster);
             model.addAttribute("propertyTypes", PropertyType.values());
-            return "sewerageRates-master";
+            return "donation-master";
         }
 
-        SewerageRatesMaster sewerageRatesMasterExisting = new SewerageRatesMaster();
-        sewerageRatesMasterExisting = sewerageRatesMasterService
-                .findByPropertyTypeAndFromDateAndActive(
-                        sewerageRatesMaster.getPropertyType(),
-                        sewerageRatesMaster.getFromDate(), true);
-        if (sewerageRatesMasterExisting != null) {
-            sewerageRatesMasterExisting.setActive(false);
-            sewerageRatesMasterExisting.setToDate(sewerageRatesMaster.getFromDate());
-            sewerageRatesMasterService.update(sewerageRatesMasterExisting);
-            
-            sewerageRatesMaster.setActive(true);
-            sewerageRatesMasterService.create(sewerageRatesMaster);
+        DonationMaster donationMasterExist = new DonationMaster();
+        donationMasterExist = donationMasterService.findByPropertyTypeAndNoOfClosetsAndFromDateAndActive
+                (donationMaster.getPropertyType(), donationMaster.getNoOfClosets(), donationMaster.getFromDate(), true);
+        if (donationMasterExist != null) {
+            donationMasterExist.setActive(false);
+            donationMasterExist.setToDate(donationMaster.getFromDate());
+            donationMasterService.update(donationMasterExist);
+
+            donationMaster.setActive(true);
+            donationMasterService.create(donationMaster);
         } else {
-            SewerageRatesMaster sewerageRatesMasterOld = null;
-            sewerageRatesMasterOld = sewerageRatesMasterService.findByPropertyTypeAndActive(
-                    sewerageRatesMaster.getPropertyType(), true);
-            if (sewerageRatesMasterOld != null) {
-                sewerageRatesMasterOld.setActive(false);
-                sewerageRatesMasterOld.setToDate(new DateTime(sewerageRatesMaster.getFromDate()).minusDays(1).toDate());
-                sewerageRatesMasterService.update(sewerageRatesMasterOld);
+            DonationMaster donationMasterOld = null;
+            donationMasterOld = donationMasterService.findByPropertyTypeAndNoOfClosetsAndActive(donationMaster.getPropertyType(),
+                    donationMaster.getNoOfClosets(), true);
+            if (donationMasterOld != null) {
+                donationMasterOld.setActive(false);
+                donationMasterOld.setToDate(new DateTime(donationMaster.getFromDate()).minusDays(1).toDate());
+                donationMasterService.update(donationMasterOld);
             }
-            sewerageRatesMaster.setActive(true);
-            sewerageRatesMasterService.create(sewerageRatesMaster);
+            donationMaster.setActive(true);
+            donationMasterService.create(donationMaster);
+            redirectAttrs.addAttribute("donationMaster", donationMaster);
         }
-
-        redirectAttrs.addAttribute("sewerageRatesMaster", sewerageRatesMaster);
-        return "redirect:/masters/getseweragerates?id=" + sewerageRatesMaster.getId();
-
+        redirectAttrs.addAttribute("donationMaster", donationMaster);
+        return "redirect:/masters/donationmastersuccess?id=" + donationMaster.getId();
     }
 
-    @RequestMapping(value = "/getseweragerates", method = RequestMethod.GET)
+    @RequestMapping(value = "/donationmastersuccess", method = RequestMethod.GET)
     public String getSeweragerates(@RequestParam("id") Long id, Model model) {
-        SewerageRatesMaster sewerageRatesMaster = sewerageRatesMasterService.findBy(id);
-        model.addAttribute("sewerageRatesMaster",
-                sewerageRatesMaster);
-        model.addAttribute("message", "msg.seweragemonthlyrate.creation.success");
-        return "sewerageRates-success";
+        DonationMaster donationMaster = donationMasterService.findById(id);
+        model.addAttribute("donationMaster", donationMaster);
+        model.addAttribute("message", "msg.donationrate.creation.success");
+        return "donation-master-success";
     }
 }
