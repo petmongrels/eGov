@@ -24,13 +24,15 @@ FAQ related to various deployment and development issues are discussed [here][FA
 * Install [maven >= v3.2.x][Maven]
 * Install [PostgreSQL >= v9.3 ][PostgreSQL]
 * Install [Elastic Search >= v1.7.1][Elastic Search]
-* Install [Jboss Wildfly v9.0.x][Wildfly Customized]
-* [Git][] and [JDK 8 update 66 or later][JDK8 build]
+* Install [Jboss Wildfly v9.0.x][Wildfly Customized] (Download and unzip in your folder of choice)
+* [Git][] and [JDK 8 update 66 or later][JDK8 build] (JDK install example - http://tecadmin.net/install-oracle-java-8-jdk-8-ubuntu-via-ppa/)
 
 #### Database Setup
-Create a database and user in postgres
+Create a database and user in postgres. Useful link for postgres setup - https://help.ubuntu.com/community/PostgreSQL. You could also consider installing pgadmin3 as a useful client for postgres.
+If you are accessing postgres remotely then this link could be useful http://askubuntu.com/questions/423165/remotely-access-postgresql-database.
 
 #### Elastic Search Setup
+First two commands in mentioned in step 2 in following link are useful for elastic search setup.  https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-elasticsearch-on-ubuntu-14-04
 Elastic seach server properties needs to be configured in `elasticsearch.yml` under `<ELASTICSEARCH_INSTALL_DIR>/config`
 ```properties
 cluster.name: elasticsearch-<username> ## Your local elasticsearch clustername, DO NOT use default clustername
@@ -143,7 +145,7 @@ By default eGov suit uses embedded redis server (work only in Linux & OSx), to m
           └── module.xml
   ```
 3. Update settings in `standalone.xml` under `<JBOSS_HOME>/standalone/configuration`
- * Check Datasource setting is in sync with your database details.
+ * Check Datasource setting is in sync with your database details. Please note that these are repeated twice in the file and both of them need to be changed.
   ```
   <connection-url>jdbc:postgresql://localhost:5432/<YOUR_DB_NAME></connection-url>
   <security>
